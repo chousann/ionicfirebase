@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      roomlist works!
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngFor="let room of roomList" class="welcome-card" (click)="joinRoom(room.id, room.name)">
+    <ion-card-content>
+      <p>{{room.name}}</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

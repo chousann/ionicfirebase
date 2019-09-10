@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      {{name}}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngFor="let item of messageList" class="welcome-card">
+    <ion-card-content>
+      <p *ngIf="currentUsr == item.userId" style="color: red;text-align: right">{{item.name}} :{{item.message}}</p>
+      <p *ngIf="currentUsr != item.userId" style="color: blue;text-align: left">{{item.name}} :{{item.message}}</p>
+    </ion-card-content>
+  </ion-card>
+  <div>
+    <ion-input type="text" [(ngModel)]="message"></ion-input>
+    <ion-button (click)="send()">send</ion-button>
+  </div>
+</ion-content>

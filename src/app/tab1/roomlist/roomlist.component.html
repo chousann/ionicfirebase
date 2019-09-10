@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      roomlist works!
+    </ion-title>
+    <ion-button (click)="createRoom()">创建聊天室</ion-button>
+    <ion-button (click)="joinRoom()">加入聊天室</ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngFor="let room of roomList" class="welcome-card" (click)="openRoom(room.id, room.name)">
+    <ion-card-content>
+      <p>{{room.name}}</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

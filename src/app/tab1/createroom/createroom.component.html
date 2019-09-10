@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      createroom works!
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="errorFlag">
+    <p>{{errorMessage}}</p>
+  </div>
+
+  <div>
+    <ion-input type="text" [(ngModel)]="id"></ion-input>
+    <ion-input type="text" [(ngModel)]="name"></ion-input>
+    <ion-button (click)="create()">create</ion-button>
+    <ion-button (click)="back()">back</ion-button>
+  </div>
+</ion-content>

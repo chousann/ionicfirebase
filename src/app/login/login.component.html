@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      login works!
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="errorFlag">
+    <p>{{errorMessage}}</p>
+  </div>
+
+  <div>
+    <ion-input type="text" [(ngModel)]="user"></ion-input>
+    <ion-input type="password" [(ngModel)]="password"></ion-input>
+    <ion-button (click)="login()">login</ion-button>
+    <ion-button (click)="logout()">logout</ion-button>
+  </div>
+
+  <div>
+    <p>没有账号？ 去注册</p>
+    <ion-button (click)="goToRegister()">注册账号</ion-button>
+  </div>
+</ion-content>
