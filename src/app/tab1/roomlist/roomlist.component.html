@@ -1,17 +1,26 @@
-<ion-header>
+<ion-header translucent>
   <ion-toolbar>
-    <ion-title>
-      roomlist works!
-    </ion-title>
+    <ion-title>Roomlist</ion-title>
     <ion-button (click)="createRoom()">创建聊天室</ion-button>
     <ion-button (click)="joinRoom()">加入聊天室</ion-button>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-card *ngFor="let room of roomList" class="welcome-card" (click)="openRoom(room.id, room.name)">
-    <ion-card-content>
-      <p>{{room.name}}</p>
-    </ion-card-content>
-  </ion-card>
+<ion-content fullscreen>
+  <ion-list id="list">
+    <ion-item *ngFor="let room of roomList let i = index" (click)="openRoom(room.id, room.name)">
+      <ion-avatar slot="start">
+        <img [src]="'https://www.gravatar.com/avatar/' + i + '?d=monsterid&f=y'">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{room.name}}</h2>
+        <p>Created By ...</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- <ion-infinite-scroll threshold="100px" id="infinite-scroll">
+    <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll> -->
 </ion-content>

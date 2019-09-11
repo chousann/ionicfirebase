@@ -20,7 +20,8 @@ export class RoomComponent implements OnInit {
   messageList: Array<any> = new Array<any>();
   currentUsr: string;
   constructor(
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private router: Router
   ) {
     this.currentUsr = firebase.auth().currentUser.uid;
     this.id = this.activatedRoute.snapshot.params['id'];
@@ -57,6 +58,10 @@ export class RoomComponent implements OnInit {
     .catch(e => {
       console.log(e);
     });
+  }
+
+  back() {
+    this.router.navigate(['/tabs/tab1/roomlist']);
   }
 
 }
