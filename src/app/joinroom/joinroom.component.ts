@@ -51,4 +51,8 @@ export class JoinroomComponent implements OnInit {
     });
   }
 
+  back() {
+    this.router.navigate(['/tabs/tab1/roomlist']);
+  }
+
 }

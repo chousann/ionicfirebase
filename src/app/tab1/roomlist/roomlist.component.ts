@@ -4,7 +4,7 @@ import 'firebase/auth';
 import 'firebase/database';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController, ModalController } from '@ionic/angular';
-import { CreateroomComponent } from '../createroom/createroom.component';
+import { CreateroomComponent } from '../../createroom/createroom.component';
 @Component({
   selector: 'app-roomlist',
   templateUrl: './roomlist.component.html',
@@ -38,7 +38,7 @@ export class RoomlistComponent implements OnInit {
   }
 
   openRoom(roomId: any, roomName: any) {
-    this.router.navigate(['/tabs/tab1/room', {id: roomId, name: roomName}]);
+    this.router.navigate(['/room', {id: roomId, name: roomName}]);
   }
 
   async createRoom() {
@@ -46,11 +46,11 @@ export class RoomlistComponent implements OnInit {
     //   component: CreateroomComponent
     // });
     // await modal.present();
-    this.router.navigate(['/tabs/tab1/createroom']);
+    this.router.navigate(['/createroom']);
   }
 
   joinRoom() {
-    this.router.navigate(['/tabs/tab1/joinroom']);
+    this.router.navigate(['/joinroom']);
   }
 
 }

@@ -11,11 +11,17 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
 import { RegisterComponent } from './register/register.component';
+import { RoomComponent } from './room/room.component';
+import { CreateroomComponent } from './createroom/createroom.component';
+import { JoinroomComponent } from './joinroom/joinroom.component';
 @NgModule({
   declarations: [AppComponent,
     LoginComponent,
     LogoutComponent,
-    RegisterComponent
+    RegisterComponent,
+    RoomComponent,
+    CreateroomComponent,
+    JoinroomComponent
   ],
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FormsModule],
