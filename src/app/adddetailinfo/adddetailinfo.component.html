@@ -1,0 +1,19 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>完善信息</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-list>
+    <ion-item>
+      <ion-label>昵称： </ion-label>
+      <ion-textarea autoGrow="true" rows="1" [(ngModel)]="displayName"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label>头像： </ion-label>
+      <ion-textarea autoGrow="true" rows="1" [(ngModel)]="photoURL"></ion-textarea>
+    </ion-item>
+  </ion-list>
+  <ion-button (click)="updateDetailinfo()">提交</ion-button>
+</ion-content>

@@ -14,6 +14,10 @@ import { RegisterComponent } from './register/register.component';
 import { RoomComponent } from './room/room.component';
 import { CreateroomComponent } from './createroom/createroom.component';
 import { JoinroomComponent } from './joinroom/joinroom.component';
+import { AddpopoverComponent } from './addpopover/addpopover.component';
+import { AddfriendComponent } from './addfriend/addfriend.component';
+import { AdddetailinfoComponent } from './adddetailinfo/adddetailinfo.component';
+import { PrivateroomComponent } from './privateroom/privateroom.component';
 @NgModule({
   declarations: [AppComponent,
     LoginComponent,
@@ -21,9 +25,15 @@ import { JoinroomComponent } from './joinroom/joinroom.component';
     RegisterComponent,
     RoomComponent,
     CreateroomComponent,
-    JoinroomComponent
+    JoinroomComponent,
+    AddpopoverComponent,
+    AddfriendComponent,
+    AdddetailinfoComponent,
+    PrivateroomComponent
   ],
-  entryComponents: [],
+  entryComponents: [
+    AddpopoverComponent
+  ],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FormsModule],
   providers: [
     StatusBar,

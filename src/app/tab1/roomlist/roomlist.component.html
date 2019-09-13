@@ -1,20 +1,26 @@
 <ion-header translucent>
   <ion-toolbar>
-    <ion-buttons slot="start">
+    <ion-title>群聊天室</ion-title>
+    <!-- <ion-buttons>
       <ion-button (click)="createRoom()">创建聊天室</ion-button>
-    </ion-buttons>
-    <ion-title>Roomlist</ion-title>
-    <ion-buttons slot="end">
+    </ion-buttons> -->
+    <!-- <ion-buttons slot="end">
       <ion-button (click)="joinRoom()">加入聊天室</ion-button>
+    </ion-buttons> -->
+
+    <ion-buttons slot="end">
+      <ion-button (click)="add()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content fullscreen>
   <ion-list id="list">
-    <ion-item *ngFor="let room of roomList let i = index" (click)="openRoom(room.id, room.name)">
+    <ion-item *ngFor="let room of roomList let i = index" (click)="openRoom(room)">
       <ion-avatar slot="start">
-        <img [src]="'https://www.gravatar.com/avatar/' + i + '?d=monsterid&f=y'">
+        <img [src]="room.photoURL">
       </ion-avatar>
       <ion-label>
         <h2>{{room.name}}</h2>

@@ -1,9 +1,24 @@
-<ion-header>
+<ion-header translucent>
   <ion-toolbar>
-    <ion-title>
-      Tab Two
-    </ion-title>
+    <ion-title>好友</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content></ion-content>
+<ion-content fullscreen>
+  <ion-list id="list">
+    <ion-item *ngFor="let friend of friendList let i = index" (click)="openRoom(friend)">
+      <ion-avatar slot="start">
+        <img [src]="friend.photoURL">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{friend.name}}</h2>
+        <p>Created By ...</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- <ion-infinite-scroll threshold="100px" id="infinite-scroll">
+      <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll> -->
+</ion-content>

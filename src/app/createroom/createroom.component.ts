@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 export class CreateroomComponent implements OnInit {
   id: string;
   name: string;
+  photoURL: string;
   
   errorFlag: boolean;
   errorMessage: string;
@@ -30,17 +31,17 @@ export class CreateroomComponent implements OnInit {
   async create() {
     const loader = await this.loadingController.create();
     await loader.present();
-    this.db.ref('/rooms').push({
-      roomId: this.id,
-      roomName: this.name
+    this.db.ref('/rooms/' + this.id).set({
+      name: this.name,
+      photoURL: this.photoURL
     })
     .then(data => {
-      this.db.ref('/users/' + firebase.auth().currentUser.uid + '/rooms' ).push({
-        roomId: data.roomId,
-        roomName: data.roomName
+      this.db.ref('/users/' + firebase.auth().currentUser.uid + '/rooms/' + this.id).set({
+        name: this.name,
+        photoURL: this.photoURL
       })
     })
-    .then(data => {
+    .then(() => {
       this.errorFlag = false;
       this.errorMessage = '';
       loader.dismiss();

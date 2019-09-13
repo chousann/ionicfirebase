@@ -14,9 +14,22 @@
     <p>{{errorMessage}}</p>
   </div>
 
+  <ion-list>
+    <ion-item>
+      <ion-label>id: </ion-label>
+      <ion-input type="text" [(ngModel)]="id"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>name: </ion-label>
+      <ion-input type="text" [(ngModel)]="name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>photoURL: </ion-label>
+      <ion-input type="text" [(ngModel)]="photoURL"></ion-input>
+    </ion-item>
+  </ion-list>
+
   <div>
-    <ion-input type="text" [(ngModel)]="id"></ion-input>
-    <ion-input type="text" [(ngModel)]="name"></ion-input>
     <ion-button (click)="create()">create</ion-button>
     <ion-button (click)="back()">back</ion-button>
   </div>

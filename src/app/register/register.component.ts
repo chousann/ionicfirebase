@@ -30,10 +30,16 @@ export class RegisterComponent implements OnInit {
 
     firebase.auth().createUserWithEmailAndPassword(this.user, this.password)
       .then(authData => {
-        this.errorFlag = false;
-        this.errorMessage = '';
-        loader.dismiss();
-        this.router.navigate(['/top']);
+        firebase.database().ref('/users/' + authData.user.uid).set({
+          displayName: authData.user.displayName,
+          photoURL: authData.user.photoURL
+        })
+        .then(data =>{
+          this.errorFlag = false;
+          this.errorMessage = '';
+          loader.dismiss();
+          this.router.navigate(['/adddetailinfo']);
+        });
       })
       .catch((error) => {
         // Handle Errors here.

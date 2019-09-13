@@ -13,13 +13,13 @@
   <ion-list>
     <ion-item *ngFor="let room of roomList let i = index">
       <ion-avatar slot="start">
-        <img [src]="'https://www.gravatar.com/avatar/' + i + '?d=monsterid&f=y'">
+        <img [src]="room.photoURL">
       </ion-avatar>
       <ion-label>
         <h2>{{room.name}}</h2>
         <p>Created By ...</p>
       </ion-label>
-      <ion-label (click)="joinRoom(room.id, room.name)">
+      <ion-label (click)="joinRoom(room)">
         <h2>加入该聊天室</h2>
       </ion-label>
     </ion-item>

@@ -5,6 +5,8 @@ import 'firebase/database';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController, ModalController } from '@ionic/angular';
 import { CreateroomComponent } from '../../createroom/createroom.component';
+import { PopoverController } from '@ionic/angular';
+import { AddpopoverComponent } from 'src/app/addpopover/addpopover.component';
 @Component({
   selector: 'app-roomlist',
   templateUrl: './roomlist.component.html',
@@ -13,10 +15,12 @@ import { CreateroomComponent } from '../../createroom/createroom.component';
 export class RoomlistComponent implements OnInit {
 
   public roomList: Array<any> = new Array<any>();
+  public popover: any;
   constructor(
     private router: Router,
     private loadingController: LoadingController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private popoverController: PopoverController
   ) {
   }
 
@@ -27,8 +31,8 @@ export class RoomlistComponent implements OnInit {
       snapshot.forEach(snap => {
         rawList.push({
           key: snap.key,
-          name: snap.val().roomName,
-          id: snap.val().roomId
+          name: snap.val().name,
+          photoURL: snap.val().photoURL
         });
         return false
       });
@@ -37,8 +41,8 @@ export class RoomlistComponent implements OnInit {
     });
   }
 
-  openRoom(roomId: any, roomName: any) {
-    this.router.navigate(['/room', {id: roomId, name: roomName}]);
+  openRoom(room: any) {
+    this.router.navigate(['/room', {id: room.key, name: room.name}]);
   }
 
   async createRoom() {
@@ -51,6 +55,21 @@ export class RoomlistComponent implements OnInit {
 
   joinRoom() {
     this.router.navigate(['/joinroom']);
+  }
+
+  async add() {
+    const popover = await this.popoverController.create({
+      component: AddpopoverComponent,
+      translucent: true,
+      componentProps: {
+        'callback' : this.callback
+      }
+    });
+    return await popover.present();
+  }
+
+  callback() {
+    this.popover.dismiss();
   }
 
 }

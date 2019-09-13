@@ -1,0 +1,32 @@
+<ion-header translucent>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="back()">
+          <ion-icon name="arrow-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title>Search User</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content fullscreen>
+    <ion-list>
+      <ion-item *ngFor="let user of userList let i = index">
+        <ion-avatar slot="start">
+          <img [src]="user.photoURL">
+        </ion-avatar>
+        <ion-label>
+          <h2>{{user.displayName}}</h2>
+          <p>Created By ...</p>
+        </ion-label>
+        <ion-label (click)="addfriend(user)">
+          <h2>添加好友</h2>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  
+    <!-- <ion-infinite-scroll threshold="100px" id="infinite-scroll">
+        <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll> -->
+  </ion-content>

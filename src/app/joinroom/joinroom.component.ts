@@ -21,8 +21,8 @@ export class JoinroomComponent implements OnInit {
       snapshot.forEach(snap => {
         rawList.push({
           key: snap.key,
-          name: snap.val().roomName,
-          id: snap.val().roomId
+          name: snap.val().name,
+          photoURL: snap.val().photoURL
         });
         return false
       });
@@ -33,13 +33,13 @@ export class JoinroomComponent implements OnInit {
 
   ngOnInit() { }
 
-  async joinRoom(id: any, name: any) {
+  async joinRoom(room: any) {
 
     const loader = await this.loadingController.create();
     await loader.present();
-    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/rooms').push({
-      roomId: id,
-      roomName: name
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/rooms/' + room.key).set({
+      name: room.name,
+      photoURL: room.photoURL
     })
     .then(data => {
       loader.dismiss();

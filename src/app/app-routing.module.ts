@@ -6,6 +6,9 @@ import { RegisterComponent } from './register/register.component';
 import { JoinroomComponent } from './joinroom/joinroom.component';
 import { CreateroomComponent } from './createroom/createroom.component';
 import { RoomComponent } from './room/room.component';
+import { AddfriendComponent } from './addfriend/addfriend.component';
+import { AdddetailinfoComponent } from './adddetailinfo/adddetailinfo.component';
+import { PrivateroomComponent } from './privateroom/privateroom.component';
 
 const routes: Routes = [
   {
@@ -33,6 +36,15 @@ const routes: Routes = [
   },
   {
     path: 'joinroom', component: JoinroomComponent
+  },
+  {
+    path: 'addfriend', component: AddfriendComponent
+  },
+  {
+    path: 'adddetailinfo', component: AdddetailinfoComponent
+  },
+  {
+    path: 'privateroom', component: PrivateroomComponent
   }
 ];
 @NgModule({

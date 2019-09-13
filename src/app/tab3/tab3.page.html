@@ -1,9 +1,19 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      Tab Three
+      用户信息
     </ion-title>
   </ion-toolbar>
 </ion-header>
-
-<ion-content></ion-content>
+<ion-content fullscreen>
+  <ion-card>
+    <img [src]="photoURL" />
+    <ion-card-header>
+      <ion-card-subtitle>基本信息</ion-card-subtitle>
+      <ion-card-title>昵称： {{displayName}}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      电子邮箱： {{email}}
+    </ion-card-content>
+  </ion-card>
+</ion-content>
