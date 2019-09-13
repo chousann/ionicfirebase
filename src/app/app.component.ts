@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
@@ -22,7 +22,7 @@ const firebaseConfig = {
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
@@ -30,29 +30,36 @@ export class AppComponent {
     private router: Router,
     private loadingController: LoadingController
   ) {
-    this.initializeApp();
   }
 
-  initializeApp() {
-    this.platform.ready().then(async () => {
+  async ngOnInit() {
+    await this.initializeApp();
+  }
+
+  async initializeApp() {
+    await this.platform.ready().then(async () => {
+      firebase.initializeApp(firebaseConfig);
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      firebase.initializeApp(firebaseConfig);
+      if (!firebase.auth().currentUser) {
+        this.router.navigate(['/login']);
+      }
+    })
+      .then(async () => {
+        const loader = await this.loadingController.create();
+        await loader.present();
+        await firebase.auth().onAuthStateChanged(async (user) => {
 
-      const loader = await this.loadingController.create();
-      await loader.present();
-      firebase.auth().onAuthStateChanged(async (user) => {
-
-        if (!user) {
-          console.log("logout");
-          await loader.dismiss();
-          this.router.navigate(['/logout']);
-        } else {
-          console.log("login");
-          await loader.dismiss();
-          //this.router.navigate(['/']);       
-        }
+          if (!user) {
+            console.log("logout");
+            await loader.dismiss();
+            this.router.navigate(['/login']);
+          } else {
+            console.log("login");
+            await loader.dismiss();
+            //this.router.navigate(['/']);       
+          }
+        });
       });
-    });
   }
 }
