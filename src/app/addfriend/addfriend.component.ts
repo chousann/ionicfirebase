@@ -38,21 +38,13 @@ export class AddfriendComponent implements OnInit {
 
     const loader = await this.loadingController.create();
     await loader.present();
-    firebase.database().ref('/privaterooms').push({
-      member1: firebase.auth().currentUser.uid,
-      member2: user.key
+    firebase.database().ref('/friends/' + firebase.auth().currentUser.uid + '/' + user.key).set({
+      uid: user.key
     })
     .then(data => {
-      firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/friends/' + user.key).set({
-        room: data.key,
-        name: user.displayName,
-        photoURL: user.photoURL
-      });
-      firebase.database().ref('/users/' + user.key + '/friends/' + firebase.auth().currentUser.uid).set({
-        room: data.key,
-        name: firebase.auth().currentUser.displayName,
-        photoURL: firebase.auth().currentUser.photoURL
-      });
+      firebase.database().ref('/friends/' + user.key + '/' + firebase.auth().currentUser.uid).set({
+        uid: firebase.auth().currentUser.uid
+      })
     })
     .then(data => {
       loader.dismiss();

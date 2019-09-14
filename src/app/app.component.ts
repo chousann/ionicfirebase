@@ -74,21 +74,14 @@ export class AppComponent implements OnInit {
         return false
       });
     });
-    firebase.database().ref('/users/' + uid + '/friends').on('value', snapshot => {
-      let rawList = [];
-      snapshot.forEach(snap => {
-        firebase.database().ref('/privaterooms/' + snap.key + '/messageList').on('value', snapshot => {
-          let rawList = [];
-          this.sendNotifications();
-        })
-        return false
-      });
-    })
+    firebase.database().ref('/friendmessages/' + uid).on('value', snapshot => {
+      this.sendNotifications();
+    });
   }
 
   sendNotifications() {
     this.localNotifications.schedule({
-      text: 'Delayed ILocalNotification',
+      text: '收到一条消息',
       trigger: { at: new Date(new Date().getTime() + 10) },
       led: 'FF0000',
       sound: null

@@ -31,7 +31,7 @@ export class PrivateroomComponent implements OnInit {
     this.id = this.activatedRoute.snapshot.params['id'];
     this.name = this.activatedRoute.snapshot.params['name'];
     this.friendphoto = this.activatedRoute.snapshot.params['photoURL'];
-    firebase.database().ref('/privaterooms/' + this.id + '/messageList').on('value', snapshot => {
+    firebase.database().ref('/friendmessages/' + this.currentUsr + '/' + this.id).on('value', snapshot => {
       let rawList = [];
       snapshot.forEach(snap => {
         rawList.push({
@@ -52,13 +52,22 @@ export class PrivateroomComponent implements OnInit {
 
   send() {
     const time = new Date();
-    firebase.database().ref('/privaterooms/' + this.id +'/messageList').push({
+    firebase.database().ref('/friendmessages/' + this.currentUsr +'/' + this.id).push({
       userId: firebase.auth().currentUser.uid,
       name: firebase.auth().currentUser.email,
       message: this.message,
       time: time
-    }).then((newMessage) => {
-      this.message = '';
+    })
+    .then(data => {
+      firebase.database().ref('/friendmessages/' +  this.id +'/' + this.currentUsr).push({
+        userId: firebase.auth().currentUser.uid,
+        name: firebase.auth().currentUser.email,
+        message: this.message,
+        time: time
+      })
+      .then((newMessage) => {
+        this.message = '';
+      })
     })
     .catch(e => {
       console.log(e);

@@ -11,7 +11,7 @@ import { AddpopoverComponent } from 'src/app/addpopover/addpopover.component';
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss']
 })
-export class Tab2Page  implements OnInit {
+export class Tab2Page implements OnInit {
   public friendList: Array<any> = new Array<any>();
   public popover: any;
   constructor(
@@ -24,24 +24,30 @@ export class Tab2Page  implements OnInit {
 
   ngOnInit() {
     let currentUser = firebase.auth().currentUser.uid;
-    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/friends').on('value', snapshot => {
+    this.getFriends();
+  }
+
+  getFriends() {
+    let currentUser = firebase.auth().currentUser.uid;
+    firebase.database().ref('/friends/' + firebase.auth().currentUser.uid).on('value', snapshot => {
       let rawList = [];
-      snapshot.forEach(snap => {
-        rawList.push({
-          key: snap.key,
-          room: snap.val().room,
-          name: snap.val().name,
-          photoURL: snap.val().photoURL
+      firebase.database().ref('/users').once('value', users => {
+        snapshot.forEach(snap => {
+          rawList.push({
+            key: snap.key,
+            name: users.child(snap.key).val().displayName,
+            photoURL: users.child(snap.key).val().photoURL,
+          });
+          return false
         });
-        return false
+        this.friendList = rawList;
+        console.log(this.friendList);
       });
-      this.friendList = rawList;
-      console.log(this.friendList);
     });
   }
 
   openRoom(friend: any) {
-    this.router.navigate(['/privateroom', {id: friend.room, name: friend.name, photoURL: friend.photoURL}]);
+    this.router.navigate(['/privateroom', { id: friend.key, name: friend.name, photoURL: friend.photoURL }]);
   }
 
   async createRoom() {
@@ -61,7 +67,7 @@ export class Tab2Page  implements OnInit {
       component: AddpopoverComponent,
       translucent: true,
       componentProps: {
-        'callback' : this.callback
+        'callback': this.callback
       }
     });
     return await popover.present();
