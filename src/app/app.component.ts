@@ -7,6 +7,7 @@ import * as firebase from "firebase/app";
 import 'firebase/auth';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 const firebaseConfig = {
   apiKey: "AIzaSyCdi_DUL90xrv2ACCad5SNjY9d84iY7j7c",
   authDomain: "hellofirebase-76124.firebaseapp.com",
@@ -28,7 +29,8 @@ export class AppComponent implements OnInit {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private localNotifications: LocalNotifications
   ) {
   }
 
@@ -39,11 +41,8 @@ export class AppComponent implements OnInit {
   async initializeApp() {
     await this.platform.ready().then(async () => {
       firebase.initializeApp(firebaseConfig);
-      this.statusBar.styleDefault();
+      //this.statusBar.styleDefault();
       this.splashScreen.hide();
-      if (!firebase.auth().currentUser) {
-        this.router.navigate(['/login']);
-      }
     })
       .then(async () => {
         const loader = await this.loadingController.create();
@@ -55,6 +54,7 @@ export class AppComponent implements OnInit {
             await loader.dismiss();
             this.router.navigate(['/login']);
           } else {
+            this.messageNotifications(user.uid);
             console.log("login");
             await loader.dismiss();
             //this.router.navigate(['/']);       
@@ -62,4 +62,37 @@ export class AppComponent implements OnInit {
         });
       });
   }
+
+  messageNotifications(uid: string) {
+    firebase.database().ref('/users/' + uid + '/rooms').on('value', snapshot => {
+      let rawList = [];
+      snapshot.forEach(snap => {
+        firebase.database().ref('/messages/' + snap.key + '/messageList').on('value', snapshot => {
+          let rawList = [];
+          this.sendNotifications();
+        })
+        return false
+      });
+    });
+    firebase.database().ref('/users/' + uid + '/friends').on('value', snapshot => {
+      let rawList = [];
+      snapshot.forEach(snap => {
+        firebase.database().ref('/privaterooms/' + snap.key + '/messageList').on('value', snapshot => {
+          let rawList = [];
+          this.sendNotifications();
+        })
+        return false
+      });
+    })
+  }
+
+  sendNotifications() {
+    this.localNotifications.schedule({
+      text: 'Delayed ILocalNotification',
+      trigger: { at: new Date(new Date().getTime() + 10) },
+      led: 'FF0000',
+      sound: null
+    });
+  }
+  
 }

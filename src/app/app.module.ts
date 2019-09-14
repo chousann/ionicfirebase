@@ -18,6 +18,7 @@ import { AddpopoverComponent } from './addpopover/addpopover.component';
 import { AddfriendComponent } from './addfriend/addfriend.component';
 import { AdddetailinfoComponent } from './adddetailinfo/adddetailinfo.component';
 import { PrivateroomComponent } from './privateroom/privateroom.component';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 @NgModule({
   declarations: [AppComponent,
     LoginComponent,
@@ -38,7 +39,8 @@ import { PrivateroomComponent } from './privateroom/privateroom.component';
   providers: [
     StatusBar,
     SplashScreen,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    LocalNotifications
   ],
   bootstrap: [AppComponent]
 })

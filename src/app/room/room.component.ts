@@ -47,7 +47,7 @@ export class RoomComponent implements OnInit {
 
   send() {
     const time = new Date();
-    firebase.database().ref('/messages/' + this.id +'/messageList').push({
+    firebase.database().ref('/messages/' + this.id + '/messageList').push({
       userId: firebase.auth().currentUser.uid,
       name: firebase.auth().currentUser.email,
       message: this.message,
@@ -55,9 +55,9 @@ export class RoomComponent implements OnInit {
     }).then((newMessage) => {
       this.message = '';
     })
-    .catch(e => {
-      console.log(e);
-    });
+      .catch(e => {
+        console.log(e);
+      });
   }
 
   back() {
