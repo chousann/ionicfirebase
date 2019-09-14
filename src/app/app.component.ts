@@ -81,8 +81,7 @@ export class AppComponent implements OnInit {
 
   sendNotifications() {
     this.localNotifications.schedule({
-      text: '收到一条消息',
-      trigger: { at: new Date(new Date().getTime() + 10) },
+      text: '收到一条新消息',
       led: 'FF0000',
       sound: null
     });

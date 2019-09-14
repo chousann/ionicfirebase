@@ -24,7 +24,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() { }
 
-  async login() {
+  async signup() {
     const loader = await this.loadingController.create();
     await loader.present();
 
@@ -48,6 +48,10 @@ export class RegisterComponent implements OnInit {
         this.errorMessage = error.message + '(' + error.code + ')';
         // ...
       });
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 
 }

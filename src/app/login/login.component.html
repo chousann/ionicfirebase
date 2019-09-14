@@ -12,10 +12,21 @@
   </div>
 
   <div>
-    <ion-input type="text" [(ngModel)]="user"></ion-input>
-    <ion-input type="password" [(ngModel)]="password"></ion-input>
-    <ion-button (click)="login()">login</ion-button>
-    <ion-button (click)="logout()">logout</ion-button>
+    <ion-list>
+      <ion-item lines="none">
+        <ion-list>
+          <ion-item>
+            <ion-label>email: </ion-label>
+            <ion-input type="text" [(ngModel)]="user"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>password: </ion-label>
+            <ion-input type="password" [(ngModel)]="password"></ion-input>
+          </ion-item>
+        </ion-list>
+        <ion-button slot="end" (click)="login()">login</ion-button>
+      </ion-item>
+    </ion-list>
   </div>
 
   <div>
