@@ -16,12 +16,14 @@ export class RoomlistComponent implements OnInit {
 
   public roomList: Array<any> = new Array<any>();
   public popover: any;
+  public freshFlag: boolean;
   constructor(
     private router: Router,
     private loadingController: LoadingController,
     private modalController: ModalController,
     private popoverController: PopoverController
   ) {
+    this.freshFlag = true;
   }
 
   ngOnInit() {
@@ -38,6 +40,7 @@ export class RoomlistComponent implements OnInit {
       });
       this.roomList = rawList;
       console.log(this.roomList);
+      this.freshFlag = false;
     });
   }
 

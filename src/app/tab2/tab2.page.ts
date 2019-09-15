@@ -14,12 +14,14 @@ import { AddpopoverComponent } from 'src/app/addpopover/addpopover.component';
 export class Tab2Page implements OnInit {
   public friendList: Array<any> = new Array<any>();
   public popover: any;
+  public freshFlag: boolean;
   constructor(
     private router: Router,
     private loadingController: LoadingController,
     private modalController: ModalController,
     private popoverController: PopoverController
   ) {
+    this.freshFlag = true;
   }
 
   ngOnInit() {
@@ -42,6 +44,7 @@ export class Tab2Page implements OnInit {
         });
         this.friendList = rawList;
         console.log(this.friendList);
+        this.freshFlag = false;
       });
     });
   }

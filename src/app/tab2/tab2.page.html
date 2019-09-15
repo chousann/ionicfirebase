@@ -5,6 +5,7 @@
 </ion-header>
 
 <ion-content fullscreen>
+  <ion-spinner *ngIf="freshFlag" name="lines-small"></ion-spinner>
   <ion-list id="list">
     <ion-item *ngFor="let friend of friendList let i = index" (click)="openRoom(friend)">
       <ion-avatar slot="start">

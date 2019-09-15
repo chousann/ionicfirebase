@@ -13,20 +13,18 @@
 
   <div>
     <ion-list>
-      <ion-item lines="none">
-        <ion-list>
-          <ion-item>
-            <ion-label>email: </ion-label>
-            <ion-input type="text" [(ngModel)]="user"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label>password: </ion-label>
-            <ion-input type="password" [(ngModel)]="password"></ion-input>
-          </ion-item>
-        </ion-list>
-        <ion-button (click)="signup()">注册账号</ion-button>
+      <ion-item>
+        <ion-label>email: </ion-label>
+        <ion-input type="text" [(ngModel)]="user"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>password: </ion-label>
+        <ion-input type="password" [(ngModel)]="password"></ion-input>
       </ion-item>
     </ion-list>
+    <ion-button style="width: 40%;margin-left: 30%;margin-right: 30%;" (click)="signup()">注册账号</ion-button>
+  </div>
+  <div>
     <ion-button (click)="goToLogin()">goToLogin</ion-button>
   </div>
 </ion-content>
