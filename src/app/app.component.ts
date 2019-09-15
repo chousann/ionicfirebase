@@ -43,6 +43,7 @@ export class AppComponent implements OnInit {
       firebase.initializeApp(firebaseConfig);
       //this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.router.navigate(['/login']);
     })
       .then(async () => {
         const loader = await this.loadingController.create();
@@ -57,7 +58,7 @@ export class AppComponent implements OnInit {
             this.messageNotifications(user.uid);
             console.log("login");
             await loader.dismiss();
-            //this.router.navigate(['/']);       
+            this.router.navigate(['/']);       
           }
         });
       });

@@ -19,9 +19,9 @@
         <h2>{{room.name}}</h2>
         <p>Created By ...</p>
       </ion-label>
-      <ion-label (click)="joinRoom(room)">
-        <h2>加入该聊天室</h2>
-      </ion-label>
+      <ion-button slot="end" (click)="joinRoom(room)">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
 

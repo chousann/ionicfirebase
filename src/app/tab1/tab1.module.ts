@@ -11,7 +11,7 @@ import { RoomlistComponent } from './roomlist/roomlist.component';
     CommonModule,
     FormsModule,
     RouterModule.forChild([
-      { path: '', component: Tab1Page },
+      { path: '', component: RoomlistComponent },
       { path: 'roomlist', component: RoomlistComponent },
       { path: 'tab1', component: Tab1Page }
     ])

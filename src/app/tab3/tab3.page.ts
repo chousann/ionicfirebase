@@ -15,9 +15,35 @@ export class Tab3Page {
   displayName: string;
   photoURL: string;
   email: string;
-  constructor() {
+  constructor(
+    private alertController: AlertController
+  ) {
     this.displayName = firebase.auth().currentUser.displayName;
     this.photoURL = firebase.auth().currentUser.photoURL;
     this.email = firebase.auth().currentUser.email;
+  }
+
+  async exit() {
+    const alert = await this.alertController.create({
+      header: 'Alert',
+      message: '确认退出登录？',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }, {
+          text: 'Okay',
+          handler: () => {
+            firebase.auth().signOut();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }
