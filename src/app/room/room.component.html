@@ -18,12 +18,12 @@
       <ion-avatar *ngIf="currentUsr == item.userId" slot="end">
         <img src="https://www.gravatar.com/avatar/2?d=monsterid&f=y">
       </ion-avatar>
-      <ion-label *ngIf="currentUsr != item.userId" style="text-align: left">
+      <div *ngIf="currentUsr != item.userId" style="float: left;max-width: 80%;margin-right: auto">
         <p>{{item.message}}</p>
-      </ion-label>
-      <ion-label *ngIf="currentUsr == item.userId" style="text-align: right">
+      </div>
+      <div *ngIf="currentUsr == item.userId" style="float: right;max-width: 80%;margin-left: auto">
         <p>{{item.message}}</p>
-      </ion-label>
+      </div>
     </ion-item>
   </ion-list>
 

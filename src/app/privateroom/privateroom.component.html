@@ -1,43 +1,43 @@
 <ion-header translucent>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-button (click)="back()">
-          <ion-icon name="arrow-back"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-title>{{name}}</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  
-  <ion-content fullscreen>
-    <ion-list>
-      <ion-item *ngFor="let item of messageList let i = index" lines="none">
-        <ion-avatar *ngIf="currentUsr != item.userId" slot="start">
-          <img [src]="friendphoto">
-        </ion-avatar>
-        <ion-avatar *ngIf="currentUsr == item.userId" slot="end">
-          <img [src]="currentUsrphoto">
-        </ion-avatar>
-        <ion-label *ngIf="currentUsr != item.userId" style="text-align: left">
-          <p>{{item.message}}</p>
-        </ion-label>
-        <ion-label *ngIf="currentUsr == item.userId" style="text-align: right">
-          <p>{{item.message}}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  
-    <!-- <ion-infinite-scroll threshold="100px" id="infinite-scroll">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-list>
+    <ion-item *ngFor="let item of messageList let i = index" lines="none">
+      <ion-avatar *ngIf="currentUsr != item.userId" slot="start">
+        <img [src]="friendphoto">
+      </ion-avatar>
+      <ion-avatar *ngIf="currentUsr == item.userId" slot="end">
+        <img [src]="currentUsrphoto">
+      </ion-avatar>
+      <div *ngIf="currentUsr != item.userId" style="float: left;max-width: 80%;margin-right: auto">
+        <p>{{item.message}}</p>
+      </div>
+      <div *ngIf="currentUsr == item.userId" style="float: right;max-width: 80%;margin-left: auto">
+        <p>{{item.message}}</p>
+      </div>
+    </ion-item>
+  </ion-list>
+
+  <!-- <ion-infinite-scroll threshold="100px" id="infinite-scroll">
         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
         </ion-infinite-scroll-content>
       </ion-infinite-scroll> -->
-  </ion-content>
-  
-  <ion-footer>
-    <div>
-      <ion-item>
-        <ion-textarea autoGrow="true" rows="1" [(ngModel)]="message"></ion-textarea>
-        <ion-button slot="end" (click)="send()">send</ion-button>
-      </ion-item>
-    </div>
-  </ion-footer>
+</ion-content>
+
+<ion-footer>
+  <div>
+    <ion-item>
+      <ion-textarea autoGrow="true" rows="1" [(ngModel)]="message"></ion-textarea>
+      <ion-button slot="end" (click)="send()">send</ion-button>
+    </ion-item>
+  </div>
+</ion-footer>
