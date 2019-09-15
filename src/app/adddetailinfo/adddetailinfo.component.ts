@@ -15,7 +15,10 @@ export class AdddetailinfoComponent implements OnInit {
   constructor(
     private router: Router,
     private loadingController: LoadingController
-  ) { }
+  ) { 
+    this.displayName = '';
+    this.photoURL = '';
+  }
 
   ngOnInit() {}
 
@@ -37,7 +40,7 @@ export class AdddetailinfoComponent implements OnInit {
       this.router.navigate(['/top']);
     })
     .catch(e => {
-      
+      loader.dismiss();
       console.log(e);
     });
   }

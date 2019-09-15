@@ -20,7 +20,10 @@ export class RegisterComponent implements OnInit {
   constructor(
     private router: Router,
     private loadingController: LoadingController
-  ) { }
+  ) {
+    this.user = '';
+    this.password = '';
+   }
 
   ngOnInit() { }
 

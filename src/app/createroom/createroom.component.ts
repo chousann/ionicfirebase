@@ -22,6 +22,9 @@ export class CreateroomComponent implements OnInit {
     private loadingController: LoadingController
   ) {
     this.db = firebase.database();
+    this.name = '';
+    this.id= '';
+    this.photoURL = '';
     this.errorFlag = false;
     this.errorMessage = '';
   }
