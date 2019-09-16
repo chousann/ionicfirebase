@@ -9,6 +9,7 @@ import { RoomComponent } from './room/room.component';
 import { AddfriendComponent } from './addfriend/addfriend.component';
 import { AdddetailinfoComponent } from './adddetailinfo/adddetailinfo.component';
 import { PrivateroomComponent } from './privateroom/privateroom.component';
+import { FirebaseuiComponent } from './firebaseui/firebaseui.component';
 
 const routes: Routes = [
   {
@@ -45,6 +46,9 @@ const routes: Routes = [
   },
   {
     path: 'privateroom', component: PrivateroomComponent
+  },
+  {
+    path: 'firebaseui', component: FirebaseuiComponent
   }
 ];
 @NgModule({

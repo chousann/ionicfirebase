@@ -19,6 +19,7 @@ import { AddfriendComponent } from './addfriend/addfriend.component';
 import { AdddetailinfoComponent } from './adddetailinfo/adddetailinfo.component';
 import { PrivateroomComponent } from './privateroom/privateroom.component';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { FirebaseuiComponent } from './firebaseui/firebaseui.component';
 @NgModule({
   declarations: [AppComponent,
     LoginComponent,
@@ -30,7 +31,8 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
     AddpopoverComponent,
     AddfriendComponent,
     AdddetailinfoComponent,
-    PrivateroomComponent
+    PrivateroomComponent,
+    FirebaseuiComponent
   ],
   entryComponents: [
     AddpopoverComponent
