@@ -20,6 +20,8 @@ import { AdddetailinfoComponent } from './adddetailinfo/adddetailinfo.component'
 import { PrivateroomComponent } from './privateroom/privateroom.component';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { FirebaseuiComponent } from './firebaseui/firebaseui.component';
+import { WebsocketService } from '../services/websocket.service';
+import { WebsocketimplService } from '../services/websocketimpl.service';
 @NgModule({
   declarations: [AppComponent,
     LoginComponent,
@@ -42,7 +44,8 @@ import { FirebaseuiComponent } from './firebaseui/firebaseui.component';
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    LocalNotifications
+    LocalNotifications,
+    { provide: WebsocketService, useClass: WebsocketimplService },
   ],
   bootstrap: [AppComponent]
 })

@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
-import 'firebase/database';
 import { LoadingController, AlertController, ModalController } from '@ionic/angular';
 import { CreateroomComponent } from '../createroom/createroom.component';
+import { WebsocketService } from '../../services/websocket.service';
+
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
@@ -21,12 +20,13 @@ export class RoomComponent implements OnInit {
   currentUsr: string;
   constructor(
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private websocketService: WebsocketService
   ) {
-    this.currentUsr = firebase.auth().currentUser.uid;
+    this.currentUsr = this.websocketService.getcurrentUser().uid;
     this.id = this.activatedRoute.snapshot.params['id'];
     this.name = this.activatedRoute.snapshot.params['name'];
-    firebase.database().ref('/messages/' + this.id + '/messageList').on('value', snapshot => {
+    this.websocketService.onMessages(this.id, snapshot => {
       let rawList = [];
       snapshot.forEach(snap => {
         rawList.push({
@@ -47,12 +47,7 @@ export class RoomComponent implements OnInit {
 
   send() {
     const time = new Date();
-    firebase.database().ref('/messages/' + this.id + '/messageList').push({
-      userId: firebase.auth().currentUser.uid,
-      name: firebase.auth().currentUser.email,
-      message: this.message,
-      time: time
-    }).then((newMessage) => {
+    this.websocketService.roomsend(this.id, this.message).then((newMessage) => {
       this.message = '';
     })
       .catch(e => {

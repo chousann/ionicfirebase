@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
-import 'firebase/database';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { WebsocketService } from '../../services/websocket.service';
+
 @Component({
   selector: 'app-addfriend',
   templateUrl: './addfriend.component.html',
@@ -14,10 +13,10 @@ export class AddfriendComponent implements OnInit {
   public userList: Array<any> = new Array<any>();
   constructor(
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private websocketService: WebsocketService
   ) {
-    let currentUser = firebase.auth().currentUser.uid;
-    firebase.database().ref('/users').on('value', snapshot => {
+    this.websocketService.onUsers(snapshot => {
       let rawList = [];
       snapshot.forEach(snap => {
         rawList.push({
@@ -38,14 +37,7 @@ export class AddfriendComponent implements OnInit {
 
     const loader = await this.loadingController.create();
     await loader.present();
-    firebase.database().ref('/friends/' + firebase.auth().currentUser.uid + '/' + user.key).set({
-      uid: user.key
-    })
-    .then(data => {
-      firebase.database().ref('/friends/' + user.key + '/' + firebase.auth().currentUser.uid).set({
-        uid: firebase.auth().currentUser.uid
-      })
-    })
+    this.websocketService.addfriend(user)
     .then(data => {
       loader.dismiss();
       this.router.navigate(['/tabs/tab2']);

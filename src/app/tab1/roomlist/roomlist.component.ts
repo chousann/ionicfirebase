@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
-import 'firebase/database';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController, ModalController } from '@ionic/angular';
 import { CreateroomComponent } from '../../createroom/createroom.component';
 import { PopoverController } from '@ionic/angular';
 import { AddpopoverComponent } from 'src/app/addpopover/addpopover.component';
+import { WebsocketService } from '../../../services/websocket.service';
+
 @Component({
   selector: 'app-roomlist',
   templateUrl: './roomlist.component.html',
@@ -21,14 +20,14 @@ export class RoomlistComponent implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private modalController: ModalController,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private websocketService: WebsocketService
   ) {
     this.freshFlag = true;
   }
 
   ngOnInit() {
-    let currentUser = firebase.auth().currentUser.uid;
-    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/rooms').on('value', snapshot => {
+    this.websocketService.onMyRooms(snapshot => {
       let rawList = [];
       snapshot.forEach(snap => {
         rawList.push({

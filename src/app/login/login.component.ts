@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-
-import * as firebase from "firebase/app";
-import 'firebase/auth';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
-import * as firebaseui from 'firebaseui'
+import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +18,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private WebsocketService: WebsocketService
   ) {
     this.errorFlag = false;
     this.errorMessage = '';
@@ -33,7 +31,7 @@ export class LoginComponent implements OnInit {
     const loader = await this.loadingController.create();
     await loader.present();
 
-    firebase.auth().signInWithEmailAndPassword(this.user, this.password)
+    this.WebsocketService.login(this.user, this.password)
       .then(authData => {
         this.errorFlag = false;
         this.errorMessage = '';
@@ -51,7 +49,7 @@ export class LoginComponent implements OnInit {
   async logout() {
     const loader = await this.loadingController.create();
     await loader.present();
-    firebase.auth().signOut().then(authData => {
+    this.WebsocketService.logout().then(authData => {
       this.errorFlag = false;
       this.errorMessage = '';
       loader.dismiss();
@@ -69,9 +67,7 @@ export class LoginComponent implements OnInit {
   }
 
   logginwithgoogle1() {
-    let provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithRedirect(provider);
-    firebase.auth().getRedirectResult().then(function (result) {
+    this.WebsocketService.logginwithgoogle().then(function (result) {
       if (result.credential) {
         // This gives you a Google Access Token. You can use it to access the Google API.
         var token = result;

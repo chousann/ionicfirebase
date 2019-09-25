@@ -3,20 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
-const firebaseConfig = {
-  apiKey: "AIzaSyCdi_DUL90xrv2ACCad5SNjY9d84iY7j7c",
-  authDomain: "hellofirebase-76124.firebaseapp.com",
-  databaseURL: "https://hellofirebase-76124.firebaseio.com",
-  projectId: "hellofirebase-76124",
-  storageBucket: "",
-  messagingSenderId: "1025357322276",
-  appId: "1:1025357322276:web:d112b29f37746d31ea60b1"
-};
+import { WebsocketService } from '../services/websocket.service';
 
 @Component({
   selector: 'app-root',
@@ -30,7 +20,8 @@ export class AppComponent implements OnInit {
     private statusBar: StatusBar,
     private router: Router,
     private loadingController: LoadingController,
-    private localNotifications: LocalNotifications
+    private localNotifications: LocalNotifications,
+    private websocketService: WebsocketService
   ) {
   }
 
@@ -40,7 +31,6 @@ export class AppComponent implements OnInit {
 
   async initializeApp() {
     await this.platform.ready().then(async () => {
-      firebase.initializeApp(firebaseConfig);
       //this.statusBar.styleDefault();
       this.splashScreen.hide();
       this.router.navigate(['/login']);
@@ -48,7 +38,7 @@ export class AppComponent implements OnInit {
       .then(async () => {
         const loader = await this.loadingController.create();
         await loader.present();
-        await firebase.auth().onAuthStateChanged(async (user) => {
+        this.websocketService.onAuthStateChanged(async (user) => {
 
           if (!user) {
             console.log("logout");
@@ -65,18 +55,12 @@ export class AppComponent implements OnInit {
   }
 
   messageNotifications(uid: string) {
-    firebase.database().ref('/users/' + uid + '/rooms').on('value', snapshot => {
-      let rawList = [];
-      snapshot.forEach(snap => {
-        firebase.database().ref('/messages/' + snap.key + '/messageList').on('value', snapshot => {
-          let rawList = [];
-          this.sendNotifications();
-        })
-        return false
+    this.websocketService.messageNotifications(uid, () => {
+      this.localNotifications.schedule({
+        text: '收到一条新消息',
+        led: 'FF0000',
+        sound: null
       });
-    });
-    firebase.database().ref('/friendmessages/' + uid).on('value', snapshot => {
-      this.sendNotifications();
     });
   }
 

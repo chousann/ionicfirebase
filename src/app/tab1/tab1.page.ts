@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
 import { Router } from '@angular/router';
+import { WebsocketService } from '../../services/websocket.service';
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -10,7 +9,8 @@ import { Router } from '@angular/router';
 export class Tab1Page {
 
   constructor(
-    private router: Router
+    private router: Router,
+    private websocketService: WebsocketService
   ) {
   }
 
@@ -19,7 +19,7 @@ export class Tab1Page {
   }
 
   onlogout() {
-    firebase.auth().signOut();
+    this.websocketService.logout();
   }
 
   rooms() {

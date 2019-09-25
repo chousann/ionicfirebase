@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { WebsocketService } from '../../services/websocket.service';
+
 @Component({
   selector: 'app-adddetailinfo',
   templateUrl: './adddetailinfo.component.html',
@@ -14,7 +14,8 @@ export class AdddetailinfoComponent implements OnInit {
   photoURL: string;
   constructor(
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private websocketService: WebsocketService
   ) { 
     this.displayName = '';
     this.photoURL = '';
@@ -25,16 +26,7 @@ export class AdddetailinfoComponent implements OnInit {
   async updateDetailinfo() {
     const loader = await this.loadingController.create();
     await loader.present();
-    firebase.auth().currentUser.updateProfile({
-      'displayName': this.displayName,
-      'photoURL': this.photoURL
-    })
-    .then(() => {
-      firebase.database().ref('/users/' + firebase.auth().currentUser.uid).set({
-        displayName: this.displayName,
-        photoURL: this.photoURL
-      });
-    })
+    this.websocketService.updateDetailinfo(this.displayName, this.photoURL)
     .then(() => {
       loader.dismiss();
       this.router.navigate(['/top']);

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-register',
@@ -19,11 +18,12 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private websocketService: WebsocketService
   ) {
     this.user = '';
     this.password = '';
-   }
+  }
 
   ngOnInit() { }
 
@@ -31,18 +31,12 @@ export class RegisterComponent implements OnInit {
     const loader = await this.loadingController.create();
     await loader.present();
 
-    firebase.auth().createUserWithEmailAndPassword(this.user, this.password)
-      .then(authData => {
-        firebase.database().ref('/users/' + authData.user.uid).set({
-          displayName: authData.user.displayName,
-          photoURL: authData.user.photoURL
-        })
-        .then(data =>{
-          this.errorFlag = false;
-          this.errorMessage = '';
-          loader.dismiss();
-          this.router.navigate(['/adddetailinfo']);
-        });
+    this.websocketService.signup(this.user, this.password)
+      .then(data => {
+        this.errorFlag = false;
+        this.errorMessage = '';
+        loader.dismiss();
+        this.router.navigate(['/adddetailinfo']);
       })
       .catch((error) => {
         // Handle Errors here.

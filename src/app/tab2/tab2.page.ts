@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
-import 'firebase/database';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController, ModalController } from '@ionic/angular';
 import { PopoverController } from '@ionic/angular';
 import { AddpopoverComponent } from 'src/app/addpopover/addpopover.component';
+import { WebsocketService } from '../../services/websocket.service';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
@@ -19,34 +17,22 @@ export class Tab2Page implements OnInit {
     private router: Router,
     private loadingController: LoadingController,
     private modalController: ModalController,
-    private popoverController: PopoverController
+    private popoverController: PopoverController,
+    private websocketService: WebsocketService
   ) {
     this.freshFlag = true;
   }
 
   ngOnInit() {
-    let currentUser = firebase.auth().currentUser.uid;
     this.getFriends();
   }
 
   getFriends() {
-    let currentUser = firebase.auth().currentUser.uid;
-    firebase.database().ref('/friends/' + firebase.auth().currentUser.uid).on('value', snapshot => {
-      let rawList = [];
-      firebase.database().ref('/users').once('value', users => {
-        snapshot.forEach(snap => {
-          rawList.push({
-            key: snap.key,
-            name: users.child(snap.key).val().displayName,
-            photoURL: users.child(snap.key).val().photoURL,
-          });
-          return false
-        });
-        this.friendList = rawList;
+    this.websocketService.onMyFriends(snapshot => {
+        this.friendList = snapshot;
         console.log(this.friendList);
         this.freshFlag = false;
       });
-    });
   }
 
   openRoom(friend: any) {

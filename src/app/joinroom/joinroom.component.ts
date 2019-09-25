@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
-import 'firebase/database';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { WebsocketService } from '../../services/websocket.service';
+
 @Component({
   selector: 'app-joinroom',
   templateUrl: './joinroom.component.html',
@@ -13,10 +12,10 @@ export class JoinroomComponent implements OnInit {
   public roomList: Array<any> = new Array<any>();
   constructor(
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private websocketService: WebsocketService
   ) {
-    let currentUser = firebase.auth().currentUser.uid;
-    firebase.database().ref('/rooms').on('value', snapshot => {
+    this.websocketService.onRooms(snapshot => {
       let rawList = [];
       snapshot.forEach(snap => {
         rawList.push({
@@ -37,10 +36,7 @@ export class JoinroomComponent implements OnInit {
 
     const loader = await this.loadingController.create();
     await loader.present();
-    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/rooms/' + room.key).set({
-      name: room.name,
-      photoURL: room.photoURL
-    })
+    this.websocketService.joinRoom(room)
     .then(data => {
       loader.dismiss();
       this.router.navigate(['/tabs/tab1/roomlist']);

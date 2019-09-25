@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import * as firebase from "firebase/app";
-import 'firebase/auth';
-import 'firebase/database';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { WebsocketService } from '../../services/websocket.service';
+
 @Component({
   selector: 'app-createroom',
   templateUrl: './createroom.component.html',
@@ -16,12 +15,11 @@ export class CreateroomComponent implements OnInit {
   
   errorFlag: boolean;
   errorMessage: string;
-  db: any;
   constructor(
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private websocketService: WebsocketService
   ) {
-    this.db = firebase.database();
     this.name = '';
     this.id= '';
     this.photoURL = '';
@@ -34,16 +32,7 @@ export class CreateroomComponent implements OnInit {
   async create() {
     const loader = await this.loadingController.create();
     await loader.present();
-    this.db.ref('/rooms/' + this.id).set({
-      name: this.name,
-      photoURL: this.photoURL
-    })
-    .then(data => {
-      this.db.ref('/users/' + firebase.auth().currentUser.uid + '/rooms/' + this.id).set({
-        name: this.name,
-        photoURL: this.photoURL
-      })
-    })
+    this.websocketService.create(this.id, this.name, this.photoURL)
     .then(() => {
       this.errorFlag = false;
       this.errorMessage = '';
