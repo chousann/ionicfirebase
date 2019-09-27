@@ -21,7 +21,7 @@ import { PrivateroomComponent } from './privateroom/privateroom.component';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { FirebaseuiComponent } from './firebaseui/firebaseui.component';
 import { WebsocketService } from '../services/websocket.service';
-import { WebsocketimplService } from '../services/websocketimpl.service';
+import { FirebaseWebsocketService } from '../services/firebasewebsocket.service';
 @NgModule({
   declarations: [AppComponent,
     LoginComponent,
@@ -45,7 +45,7 @@ import { WebsocketimplService } from '../services/websocketimpl.service';
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     LocalNotifications,
-    { provide: WebsocketService, useClass: WebsocketimplService },
+    { provide: WebsocketService, useClass: FirebaseWebsocketService },
   ],
   bootstrap: [AppComponent]
 })

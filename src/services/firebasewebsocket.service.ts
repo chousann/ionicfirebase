@@ -20,7 +20,7 @@ const firebaseConfig = {
 @Injectable({
   providedIn: 'root'
 })
-export class WebsocketimplService extends WebsocketService {
+export class FirebaseWebsocketService extends WebsocketService {
 
   onAuthStateChanged(callback) {
     firebase.auth().onAuthStateChanged(callback);
@@ -67,12 +67,12 @@ export class WebsocketimplService extends WebsocketService {
       'displayName': displayName,
       'photoURL': photoURL
     })
-    .then(() => {
-      return firebase.database().ref('/users/' + firebase.auth().currentUser.uid).set({
-        displayName: displayName,
-        photoURL: photoURL
+      .then(() => {
+        return firebase.database().ref('/users/' + firebase.auth().currentUser.uid).set({
+          displayName: displayName,
+          photoURL: photoURL
+        });
       });
-    });
   }
 
   onUsers(callback) {
@@ -85,11 +85,11 @@ export class WebsocketimplService extends WebsocketService {
     return firebase.database().ref('/friends/' + firebase.auth().currentUser.uid + '/' + user.key).set({
       uid: user.key
     })
-    .then(data => {
-      return firebase.database().ref('/friends/' + user.key + '/' + firebase.auth().currentUser.uid).set({
-        uid: firebase.auth().currentUser.uid
-      })
-    });
+      .then(data => {
+        return firebase.database().ref('/friends/' + user.key + '/' + firebase.auth().currentUser.uid).set({
+          uid: firebase.auth().currentUser.uid
+        })
+      });
   }
 
   create(id: string, name: string, photoURL: string): Promise<any> {
@@ -99,12 +99,12 @@ export class WebsocketimplService extends WebsocketService {
       name: name,
       photoURL: photoURL
     })
-    .then(data => {
-      db.ref('/users/' + firebase.auth().currentUser.uid + '/rooms/' + id).set({
-        name: name,
-        photoURL: photoURL
-      })
-    });
+      .then(data => {
+        db.ref('/users/' + firebase.auth().currentUser.uid + '/rooms/' + id).set({
+          name: name,
+          photoURL: photoURL
+        })
+      });
   }
 
   onRooms(callback) {
@@ -133,20 +133,20 @@ export class WebsocketimplService extends WebsocketService {
   send(id: string, message: string): Promise<any> {
     let currentUsr = firebase.auth().currentUser.uid;
     const time = new Date();
-    return firebase.database().ref('/friendmessages/' + currentUsr +'/' + id).push({
+    return firebase.database().ref('/friendmessages/' + currentUsr + '/' + id).push({
       userId: firebase.auth().currentUser.uid,
       name: firebase.auth().currentUser.email,
       message: message,
       time: time
     })
-    .then(data => {
-      return firebase.database().ref('/friendmessages/' +  id +'/' + currentUsr).push({
-        userId: firebase.auth().currentUser.uid,
-        name: firebase.auth().currentUser.email,
-        message: message,
-        time: time
+      .then(data => {
+        return firebase.database().ref('/friendmessages/' + id + '/' + currentUsr).push({
+          userId: firebase.auth().currentUser.uid,
+          name: firebase.auth().currentUser.email,
+          message: message,
+          time: time
+        });
       });
-    });
   }
 
   onMessages(id: string, callback) {
