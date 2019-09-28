@@ -22,9 +22,12 @@ const firebaseConfig = {
 export class WebsocketService {
 
   constructor(
-    private loadingController: LoadingController
+    // private loadingController: LoadingController
   ) {
     console.log('websocket service');
+  }
+
+  init() {
     firebase.initializeApp(firebaseConfig);
   }
 
@@ -126,7 +129,8 @@ export class WebsocketService {
   }
 
   getcurrentUser() {
-    return firebase.auth().currentUser;
+    let c = firebase.auth().currentUser;
+    return {uid: c.uid, displayName: c.displayName, photoURL: c.photoURL, email: c.email};
   }
 
   onfriendMessage(id: string, callback) {

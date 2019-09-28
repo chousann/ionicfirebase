@@ -7,7 +7,7 @@ import 'firebase/database';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
 import * as firebaseui from 'firebaseui'
-import { WebsocketService } from '../services/websocket.service';
+import { WebsocketService } from './websocket.service';
 const firebaseConfig = {
   apiKey: "AIzaSyCdi_DUL90xrv2ACCad5SNjY9d84iY7j7c",
   authDomain: "hellofirebase-76124.firebaseapp.com",
@@ -22,6 +22,15 @@ const firebaseConfig = {
 })
 export class FirebaseWebsocketService extends WebsocketService {
 
+  constructor() {
+    super();
+    console.log('firebase websocket service');
+    this.init();
+  }
+
+  init() {
+    firebase.initializeApp(firebaseConfig);
+  }
   onAuthStateChanged(callback) {
     firebase.auth().onAuthStateChanged(callback);
   }
@@ -121,7 +130,8 @@ export class FirebaseWebsocketService extends WebsocketService {
   }
 
   getcurrentUser() {
-    return firebase.auth().currentUser;
+    let c = firebase.auth().currentUser;
+    return {uid: c.uid, displayName: c.displayName, photoURL: c.photoURL, email: c.email};
   }
 
   onfriendMessage(id: string, callback) {

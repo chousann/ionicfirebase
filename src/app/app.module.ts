@@ -22,6 +22,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { FirebaseuiComponent } from './firebaseui/firebaseui.component';
 import { WebsocketService } from '../services/websocket.service';
 import { FirebaseWebsocketService } from '../services/firebasewebsocket.service';
+import { LeanCloudWebsocketService } from 'src/services/leancloudwebsocket.service';
 @NgModule({
   declarations: [AppComponent,
     LoginComponent,
@@ -45,7 +46,7 @@ import { FirebaseWebsocketService } from '../services/firebasewebsocket.service'
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     LocalNotifications,
-    { provide: WebsocketService, useClass: FirebaseWebsocketService },
+    { provide: WebsocketService, useClass: LeanCloudWebsocketService },
   ],
   bootstrap: [AppComponent]
 })

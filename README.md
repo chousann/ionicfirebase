@@ -1,5 +1,5 @@
 Installation
-git clone https://github.com/
+git clone https://github.com/chousann/ionicfirebase.git
 
 How to run
 

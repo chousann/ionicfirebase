@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { WebsocketService } from '../../services/websocket.service';
@@ -15,7 +15,8 @@ export class AdddetailinfoComponent implements OnInit {
   constructor(
     private router: Router,
     private loadingController: LoadingController,
-    private websocketService: WebsocketService
+    private websocketService: WebsocketService,
+    private zone: NgZone
   ) { 
     this.displayName = '';
     this.photoURL = '';
@@ -28,8 +29,10 @@ export class AdddetailinfoComponent implements OnInit {
     await loader.present();
     this.websocketService.updateDetailinfo(this.displayName, this.photoURL)
     .then(() => {
-      loader.dismiss();
-      this.router.navigate(['/top']);
+      this.zone.run(() => {
+        loader.dismiss();
+        this.router.navigate(['/top']);
+      })
     })
     .catch(e => {
       loader.dismiss();
