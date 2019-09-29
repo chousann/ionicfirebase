@@ -25,6 +25,26 @@ class tofirebase {
     return this;
   }
 }
+
+class firebasemessage {
+  public key: string;
+  public name: string;
+  public userId: string;
+  public message: string;
+  public time: any;
+  val() {
+    return this;
+  }
+}
+class firebaseuser {
+  public key: string;
+  public displayName: string;
+  public photoURL: string;
+
+  val() {
+    return this;
+  }
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -94,6 +114,9 @@ export class LeanCloudWebsocketService extends WebsocketService {
 
     return user.signUp().then(userdata => {
       // 注册成功
+      this.realtime.createIMClient(userdata).then(client => {
+        return this.iMClient = client;
+      });
       console.log('注册成功。objectId：' + userdata.id);
       let u = new AV.Object('user');
       u.set('uid', userdata.id);
@@ -125,20 +148,47 @@ export class LeanCloudWebsocketService extends WebsocketService {
   }
 
   onUsers(callback) {
-    let currentUser = firebase.auth().currentUser.uid;
-    firebase.database().ref('/users').on('value', callback);
+    let query = new AV.Query('user');
+    query.find().then(querydata => {
+      let to = new tofirebase();
+      let rawList = [];
+      querydata.forEach(snap => {
+        let to = new firebaseuser();
+        to.key = snap.id;
+        to.displayName = snap.get('displayName');
+        to.photoURL = snap.get('photoURL');
+        rawList.push(to);
+        return false
+      });
+      this.ngZone.run(() => {
+        callback(rawList);
+      });
+
+    });
   }
 
   addfriend(user: any): Promise<any> {
 
-    return firebase.database().ref('/friends/' + firebase.auth().currentUser.uid + '/' + user.key).set({
-      uid: user.key
-    })
-      .then(data => {
-        return firebase.database().ref('/friends/' + user.key + '/' + firebase.auth().currentUser.uid).set({
-          uid: firebase.auth().currentUser.uid
-        })
+    return this.iMClient.createConversation({
+      members: [user.key]
+    }).then(conversation => {
+      let currentUser = AV.User.current();
+      let u = AV.Object.createWithoutData('user', currentUser.get('uid'));
+      u.addUnique('friends', [{
+        id: conversation.id,
+        name: user.displayName,
+        photoURL: user.photoURL
+      }]);
+      return u.save().then(() => {
+        let u1 = AV.Object.createWithoutData('user', user.key);
+        u1.addUnique('friends', [{
+          id: conversation.id,
+          name: currentUser.get('displayName'),
+          photoURL: currentUser.get('photoURL')
+        }]);
+        return u1.save();
       });
+    });
   }
 
   create(id: string, name: string, photoURL: string): Promise<any> {
@@ -150,11 +200,11 @@ export class LeanCloudWebsocketService extends WebsocketService {
     }).then(conversation => {
       let currentUser = AV.User.current();
       let user = AV.Object.createWithoutData('user', currentUser.get('uid'));
-      let to = new tofirebase();
-      to.key = conversation.id;
-      to.name = conversation.get('name');
-      to.photoURL = conversation.get('photoURL');
-      user.addUnique('rooms', [to]);
+      user.addUnique('rooms', [{
+        id: conversation.id,
+        name: conversation.get('name'),
+        photoURL: conversation.get('photoURL')
+      }]);
       return user.save();
     });
   }
@@ -185,10 +235,14 @@ export class LeanCloudWebsocketService extends WebsocketService {
       let currentUser = AV.User.current();
       let user = AV.Object.createWithoutData('user', currentUser.get('uid'));
       let to = new tofirebase();
-      to.key = room.id;
+      to.key = room.key;
       to.name = room.name;
       to.photoURL = room.photoURL;
-      user.addUnique('rooms', [to]);
+      user.addUnique('rooms', [{
+        id: room.key,
+        name: room.name,
+        photoURL: room.photoURL
+      }]);
       return user.save();
     });
   }
@@ -226,10 +280,71 @@ export class LeanCloudWebsocketService extends WebsocketService {
   onMessages(id: string, callback) {
     // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
 
-    this.iMClient.on(Event.MESSAGE, (message, conversation) => {
+    this.iMClient.getConversation(id).then((conversation) => {
+      this.ngZone.run(() => {
+        conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+          let rawList = [];
+          messages.forEach((message: TextMessage) => {
+            let fm = new firebasemessage();
+            fm.key = message.id;
+            fm.name = message.from;
+            fm.message = message.text;
+            fm.userId = message.from;
+            fm.time = message.timestamp;
+            rawList.push(fm);
+            return false
+          });
+          this.ngZone.run(() => {
+            callback(rawList);
+          });
+        });
+      })
+    });
+
+    this.iMClient.on(Event.MESSAGE, (message: TextMessage, conversation) => {
+      console.log('收到新消息：' + message.text);
       if (conversation.id === id) {
         console.log('收到新消息：' + message);
-        callback([]);
+        conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+          let rawList = [];
+          messages.forEach((message: TextMessage) => {
+            let fm = new firebasemessage();
+            fm.key = message.id;
+            fm.name = message.from;
+            fm.message = message.text;
+            fm.userId = message.from;
+            fm.time = message.timestamp;
+            rawList.push(fm);
+            return false
+          });
+          this.ngZone.run(() => {
+            callback(rawList);
+          });
+        });
+      }
+    });
+
+    this.iMClient.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, (conversations) => {
+      for (let conv of conversations) {
+        if (conv.id === id) {
+          console.log(conv.id, conv.name, conv.unreadMessagesCount);
+          conv.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+            let rawList = [];
+            messages.forEach((message: TextMessage) => {
+              let fm = new firebasemessage();
+              fm.key = message.id;
+              fm.name = message.from;
+              fm.message = message.text;
+              fm.userId = message.from;
+              fm.time = message.timestamp;
+              rawList.push(fm);
+              return false
+            });
+            this.ngZone.run(() => {
+              callback(rawList);
+            });
+          });
+        }
       }
     });
   }
@@ -237,7 +352,9 @@ export class LeanCloudWebsocketService extends WebsocketService {
   roomsend(id: string, message: string): Promise<any> {
 
     return this.iMClient.getConversation(id).then((conversation) => {
-      return conversation.send(new TextMessage(message));
+      this.ngZone.run(() => {
+        return conversation.send(new TextMessage(message));
+      })
     });
   }
 
