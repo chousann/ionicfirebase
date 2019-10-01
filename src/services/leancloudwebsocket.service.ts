@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, EventEmitter } from '@angular/core';
 import { WebsocketService } from '../services/websocket.service';
 
 // import AV from 'leancloud-storage/dist/av-weapp.js';
@@ -44,6 +44,8 @@ export class LeanCloudWebsocketService extends WebsocketService {
 
   realtime = new Realtime(leanCloudConfig);
   iMClient: IMClient;
+
+  eventEmitter: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private ngZone: NgZone
   ) {
@@ -162,26 +164,29 @@ export class LeanCloudWebsocketService extends WebsocketService {
 
   addfriend(user: any): Promise<any> {
 
-    return this.iMClient.createConversation({
-      members: [user.key]
-    }).then(conversation => {
-      let currentUser = AV.User.current();
-      let u = AV.Object.createWithoutData('user', currentUser.get('uid'));
-      u.addUnique('friends', [{
-        conversation: conversation.id,
-        friend: user.key,
-        name: user.displayName,
-        photoURL: user.photoURL
-      }]);
-      return u.save().then(() => {
-        let u1 = AV.Object.createWithoutData('user', user.key);
-        u1.addUnique('friends', [{
+    let query = new AV.Query('user');
+    return query.get(user.key).then(querydata => {
+      return this.iMClient.createConversation({
+        members: [querydata.get('uid')]
+      }).then(conversation => {
+        let currentUser = AV.User.current();
+        let u = AV.Object.createWithoutData('user', currentUser.get('uid'));
+        u.addUnique('friends', [{
           conversation: conversation.id,
-          friend: currentUser.id,
-          name: currentUser.getUsername(),
-          photoURL: currentUser.get('photoURL')
+          friend: user.key,
+          name: user.displayName,
+          photoURL: user.photoURL
         }]);
-        return u1.save();
+        return u.save().then(() => {
+          let u1 = AV.Object.createWithoutData('user', user.key);
+          u1.addUnique('friends', [{
+            conversation: conversation.id,
+            friend: currentUser.get('uid'),
+            name: currentUser.getUsername(),
+            photoURL: currentUser.get('photoURL')
+          }]);
+          return u1.save();
+        });
       });
     });
   }
@@ -244,7 +249,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
 
   getcurrentUser() {
     let currentUser = AV.User.current();
-    return { uid: currentUser.id, displayName: '', photoURL: '', email: '' };
+    return { uid: currentUser.id, displayName: currentUser.getUsername(), photoURL: currentUser.get('photoURL'), email: currentUser.getEmail() };
   }
 
   onfriendMessage(id: string, callback) {
@@ -316,13 +321,36 @@ export class LeanCloudWebsocketService extends WebsocketService {
         }
       }
     });
+
+    this.eventEmitter.subscribe((data) => {
+      data.conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+        let rawList = [];
+        messages.forEach((message: TextMessage) => {
+          let fm = new firebasemessage();
+          fm.key = message.id;
+          fm.name = message.from;
+          fm.message = message.text;
+          fm.userId = message.from;
+          fm.time = message.timestamp;
+          rawList.push(fm);
+          return false
+        });
+        this.ngZone.run(() => {
+          callback(rawList);
+        });
+      });
+    });
   }
 
   send(id: string, message: string): Promise<any> {
 
     return this.iMClient.getConversation(id).then((conversation) => {
       this.ngZone.run(() => {
-        return conversation.send(new TextMessage(message));
+        return conversation.send(new TextMessage(message)).then((m) => {
+          this.eventEmitter.emit({
+            conversation: conversation
+          });
+        });
       })
     });
   }
@@ -395,13 +423,36 @@ export class LeanCloudWebsocketService extends WebsocketService {
         }
       }
     });
+
+    this.eventEmitter.subscribe((data) => {
+      data.conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+        let rawList = [];
+        messages.forEach((message: TextMessage) => {
+          let fm = new firebasemessage();
+          fm.key = message.id;
+          fm.name = message.from;
+          fm.message = message.text;
+          fm.userId = message.from;
+          fm.time = message.timestamp;
+          rawList.push(fm);
+          return false
+        });
+        this.ngZone.run(() => {
+          callback(rawList);
+        });
+      });
+    });
   }
 
   roomsend(id: string, message: string): Promise<any> {
 
     return this.iMClient.getConversation(id).then((conversation) => {
       this.ngZone.run(() => {
-        return conversation.send(new TextMessage(message));
+        return conversation.send(new TextMessage(message)).then((m) => {
+          this.eventEmitter.emit({
+            conversation: conversation
+          });
+        });
       })
     });
   }
