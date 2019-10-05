@@ -13,4 +13,19 @@ Running on android
 4：ionic cordova prepare android
 5：ionic cordova run android    ||  ionic cordova run android  -l
 
+integrations cordova
+ionic integrations enable cordova
+ionic.config.json
+{
+  "name": "ionicfirebase",
+  "integrations": {},
+  "type": "angular"
+}
 
+{
+  "name": "ionicfirebase",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
