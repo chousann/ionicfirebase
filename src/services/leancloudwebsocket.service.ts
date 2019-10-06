@@ -46,6 +46,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
   iMClient: IMClient;
 
   eventEmitter: EventEmitter<any> = new EventEmitter<any>();
+  call: any;
   constructor(
     private ngZone: NgZone
   ) {
@@ -60,7 +61,11 @@ export class LeanCloudWebsocketService extends WebsocketService {
 
   onAuthStateChanged(callback) {
     var currentUser = AV.User.current();
-    callback(currentUser);
+    this.call = callback;
+    this.realtime.createIMClient(currentUser).then(client => {
+      this.iMClient = client;
+      callback(currentUser);
+    });
   }
 
   login(user: string, password: string): Promise<any> {
@@ -78,6 +83,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
   logout(): Promise<any> {
     return AV.User.logOut().then(authdata => {
       // 登录成功
+      this.call(null);
       return authdata;
     });
   }
@@ -497,6 +503,16 @@ export class LeanCloudWebsocketService extends WebsocketService {
   }
 
   messageNotifications(uid: string, callback) {
-    callback();
+
+    this.iMClient.on(Event.INVITED, function invitedEventHandler(payload, conversation) {
+      console.log(payload.invitedBy, conversation.id);
+      callback();
+    });
+
+    // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
+    this.iMClient.on(Event.MESSAGE, function (message: TextMessage, conversation) {
+      console.log('收到新消息：' + message.text);
+      callback();
+    });
   }
 }

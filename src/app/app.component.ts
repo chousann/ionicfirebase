@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
             this.messageNotifications(user.uid);
             console.log("login");
             await loader.dismiss();
-            this.router.navigate(['/login']);       
+            this.router.navigate(['/']);       
           }
         });
       });
