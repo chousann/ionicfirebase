@@ -11,7 +11,7 @@ import { WebsocketService } from '../../services/websocket.service';
 export class CreateroomComponent implements OnInit {
   id: string;
   name: string;
-  photoURL: string;
+  photoFile: File;
   
   errorFlag: boolean;
   errorMessage: string;
@@ -22,7 +22,6 @@ export class CreateroomComponent implements OnInit {
   ) {
     this.name = '';
     this.id= '';
-    this.photoURL = '';
     this.errorFlag = false;
     this.errorMessage = '';
   }
@@ -32,7 +31,7 @@ export class CreateroomComponent implements OnInit {
   async create() {
     const loader = await this.loadingController.create();
     await loader.present();
-    this.websocketService.create(this.id, this.name, this.photoURL)
+    this.websocketService.create(this.id, this.name, this.photoFile)
     .then(() => {
       this.errorFlag = false;
       this.errorMessage = '';
@@ -50,4 +49,8 @@ export class CreateroomComponent implements OnInit {
     this.router.navigate(['/tabs/tab1/roomlist']);
   }
 
+  filechange(event) {
+    this.photoFile = event.target.files[0];
+    console.log(this.photoFile);
+  }
 }

@@ -65,6 +65,8 @@ export class LeanCloudWebsocketService extends WebsocketService {
     this.realtime.createIMClient(currentUser).then(client => {
       this.iMClient = client;
       callback(currentUser);
+    }, error => {
+      callback(null);
     });
   }
 
@@ -132,20 +134,25 @@ export class LeanCloudWebsocketService extends WebsocketService {
     });
   }
 
-  updateDetailinfo(displayName: string, photoURL: string): Promise<any> {
+  updateDetailinfo(displayName: string, photoURL: File): Promise<any> {
 
     let currentUser = AV.User.current();
-
+    let file = new AV.File(photoURL.name, photoURL);
     currentUser.set('username', displayName);
-    currentUser.set('photoURL', photoURL);
+    currentUser.set('avatar', file);
     return currentUser.save().then(userdata => {
       var query = new AV.Query('user');
       query.get(userdata.get('uid')).then(querydata => {
         querydata.set('displayName', displayName);
-        querydata.set('photoURL', photoURL);
+        querydata.set('avatar', file);
         querydata.save();
       });
     });
+  }
+
+  fileUpload(localfile: File): Promise<any>{
+    let file = new AV.File(localfile.name, localfile);
+    return file.save();
   }
 
   onUsers(callback) {
@@ -157,9 +164,9 @@ export class LeanCloudWebsocketService extends WebsocketService {
         let to = new firebaseuser();
         to.key = snap.id;
         to.displayName = snap.get('displayName');
-        to.photoURL = snap.get('photoURL');
+        to.photoURL = snap.get('avatar').url();
         rawList.push(to);
-        return false
+        return false;
       });
       this.ngZone.run(() => {
         callback(rawList);
@@ -189,7 +196,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
             conversation: conversation.id,
             friend: currentUser.get('uid'),
             name: currentUser.getUsername(),
-            photoURL: currentUser.get('photoURL')
+            photoURL: currentUser.get('avatar').url()
           }]);
           return u1.save();
         });
@@ -197,21 +204,24 @@ export class LeanCloudWebsocketService extends WebsocketService {
     });
   }
 
-  create(id: string, name: string, photoURL: string): Promise<any> {
-    return this.iMClient.createConversation({
-      members: [],
-      // 对话名称
-      name: name,
-      photoURL: photoURL,
-    }).then(conversation => {
-      let currentUser = AV.User.current();
-      let user = AV.Object.createWithoutData('user', currentUser.get('uid'));
-      user.addUnique('rooms', [{
-        id: conversation.id,
-        name: conversation.get('name'),
-        photoURL: conversation.get('photoURL')
-      }]);
-      return user.save();
+  create(id: string, name: string, photoURL: File): Promise<any> {
+
+    return this.fileUpload(photoURL).then(file => {
+      return this.iMClient.createConversation({
+        members: [],
+        // 对话名称
+        name: name,
+        photoURL: file.url(),
+      }).then(conversation => {
+        let currentUser = AV.User.current();
+        let user = AV.Object.createWithoutData('user', currentUser.get('uid'));
+        user.addUnique('rooms', [{
+          id: conversation.id,
+          name: conversation.get('name'),
+          photoURL: conversation.get('photoURL')
+        }]);
+        return user.save();
+      });
     });
   }
 
@@ -255,7 +265,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
 
   getcurrentUser() {
     let currentUser = AV.User.current();
-    return { uid: currentUser.id, displayName: currentUser.getUsername(), photoURL: currentUser.get('photoURL'), email: currentUser.getEmail() };
+    return { uid: currentUser.id, displayName: currentUser.getUsername(), photoURL: currentUser.get('avatar').url(), email: currentUser.getEmail() };
   }
 
   onfriendMessage(id: string, callback) {

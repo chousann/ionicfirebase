@@ -1,6 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController, AlertController, NavController } from '@ionic/angular';
 import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
@@ -11,15 +11,16 @@ import { WebsocketService } from '../../services/websocket.service';
 export class AdddetailinfoComponent implements OnInit {
 
   displayName: string;
-  photoURL: string;
+
+  photoFile: File;
   constructor(
     private router: Router,
     private loadingController: LoadingController,
     private websocketService: WebsocketService,
-    private zone: NgZone
+    private zone: NgZone,
+    private navController: NavController
   ) { 
     this.displayName = '';
-    this.photoURL = '';
   }
 
   ngOnInit() {}
@@ -27,7 +28,7 @@ export class AdddetailinfoComponent implements OnInit {
   async updateDetailinfo() {
     const loader = await this.loadingController.create();
     await loader.present();
-    this.websocketService.updateDetailinfo(this.displayName, this.photoURL)
+    this.websocketService.updateDetailinfo(this.displayName, this.photoFile)
     .then(() => {
       this.zone.run(() => {
         loader.dismiss();
@@ -40,4 +41,12 @@ export class AdddetailinfoComponent implements OnInit {
     });
   }
 
+  filechange(event) {
+    this.photoFile = event.target.files[0];
+    console.log(this.photoFile);
+  }
+
+  back() {
+    this.router.navigate(['/top']);
+  }
 }

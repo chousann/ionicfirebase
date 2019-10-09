@@ -12,8 +12,9 @@
     </ion-item>
     <ion-item>
       <ion-label>头像： </ion-label>
-      <ion-textarea autoGrow="true" rows="1" [(ngModel)]="photoURL"></ion-textarea>
+      <ion-input type="file" (change)="filechange($event)"></ion-input>
     </ion-item>
   </ion-list>
   <ion-button (click)="updateDetailinfo()">提交</ion-button>
+  <ion-button (click)="back()">back</ion-button>
 </ion-content>

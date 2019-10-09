@@ -70,7 +70,7 @@ export class WebsocketService {
       });
   }
 
-  updateDetailinfo(displayName: string, photoURL: string): Promise<any> {
+  updateDetailinfo(displayName: string, photoURL: any): Promise<any> {
     return firebase.auth().currentUser.updateProfile({
       'displayName': displayName,
       'photoURL': photoURL
@@ -81,6 +81,10 @@ export class WebsocketService {
         photoURL: photoURL
       });
     });
+  }
+
+  fileUpload(localfile: File) {
+    console.log('ddddddddddd')
   }
 
   onUsers(callback) {
@@ -100,7 +104,7 @@ export class WebsocketService {
     });
   }
 
-  create(id: string, name: string, photoURL: string): Promise<any> {
+  create(id: string, name: string, photoURL: any): Promise<any> {
     let db;
     db = firebase.database();
     return db.ref('/rooms/' + id).set({

@@ -16,7 +16,8 @@ export class Tab3Page {
   email: string;
   constructor(
     private alertController: AlertController,
-    private websocketService: WebsocketService
+    private websocketService: WebsocketService,
+    private router: Router
   ) {
     this.displayName = this.websocketService.getcurrentUser().displayName;
     this.photoURL = this.websocketService.getcurrentUser().photoURL;
@@ -45,5 +46,9 @@ export class Tab3Page {
     });
 
     await alert.present();
+  }
+
+  updateInfo() {
+    this.router.navigate(['/adddetailinfo']);
   }
 }

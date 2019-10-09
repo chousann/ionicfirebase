@@ -24,8 +24,8 @@
       <ion-input type="text" [(ngModel)]="name"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label>photoURL: </ion-label>
-      <ion-input type="text" [(ngModel)]="photoURL"></ion-input>
+      <ion-label>photo: </ion-label>
+      <ion-input type="file" (change)="filechange($event)"></ion-input>
     </ion-item>
   </ion-list>
 
