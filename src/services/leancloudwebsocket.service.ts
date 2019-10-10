@@ -2,8 +2,10 @@ import { Injectable, NgZone, EventEmitter } from '@angular/core';
 import { WebsocketService } from '../services/websocket.service';
 
 // import AV from 'leancloud-storage/dist/av-weapp.js';
-import * as AV from 'leancloud-storage/live-query';
-import { Realtime, IMClient, TextMessage, Event } from 'leancloud-realtime';
+import * as AV from 'leancloud-storage';
+import 'leancloud-storage/live-query';
+import { Realtime, IMClient, TextMessage, Event, TypedMessage } from 'leancloud-realtime';
+import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages';
 const leanCloudConfig = {
   appId: "JQaGq03cPclsQLMx4tTGrfAX-MdYXbMMI",
   appKey: "I4P0r5JDqsa1KD0siMAASDjO"
@@ -19,11 +21,13 @@ class tofirebase {
 }
 
 class firebasemessage {
+  public type: number;
   public key: string;
   public name: string;
   public userId: string;
   public message: string;
   public time: any;
+  public imageURL: string;
   val() {
     return this;
   }
@@ -47,6 +51,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
 
   eventEmitter: EventEmitter<any> = new EventEmitter<any>();
   call: any;
+  messageList: Array<any> = new Array<any>();
   constructor(
     private ngZone: NgZone
   ) {
@@ -150,7 +155,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
     });
   }
 
-  fileUpload(localfile: File): Promise<any>{
+  fileUpload(localfile: File): Promise<any> {
     let file = new AV.File(localfile.name, localfile);
     return file.save();
   }
@@ -273,19 +278,31 @@ export class LeanCloudWebsocketService extends WebsocketService {
     // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
 
     this.iMClient.getConversation(id).then((conversation) => {
-      conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+      conversation.queryMessages({ limit: 100, type: null }).then(messages => {
         let rawList = [];
-        messages.forEach((message: TextMessage) => {
+        messages.forEach((message: TypedMessage) => {
           let fm = new firebasemessage();
           fm.key = message.id;
           fm.name = message.from;
-          fm.message = message.text;
           fm.userId = message.from;
           fm.time = message.timestamp;
+          switch (message.content._lctype) {
+            case TextMessage.TYPE:
+              fm.type = -1;
+              fm.message = message.text;
+              break;
+            case ImageMessage.TYPE:
+              fm.type = -2;
+              fm.imageURL = message.content._lcfile.url;
+              break;
+            default:
+              console.warn('收到未知类型消息');
+          }
           rawList.push(fm);
-          return false
+          return false;
         });
         this.ngZone.run(() => {
+          this.messageList = rawList;
           callback(rawList);
         });
       });
@@ -295,66 +312,107 @@ export class LeanCloudWebsocketService extends WebsocketService {
       console.log('收到新消息：' + message.text);
       if (conversation.id === id) {
         console.log('收到新消息：' + message);
-        conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-          let rawList = [];
-          messages.forEach((message: TextMessage) => {
-            let fm = new firebasemessage();
-            fm.key = message.id;
-            fm.name = message.from;
-            fm.message = message.text;
-            fm.userId = message.from;
-            fm.time = message.timestamp;
-            rawList.push(fm);
-            return false
-          });
-          this.ngZone.run(() => {
-            callback(rawList);
-          });
-        });
-      }
-    });
-
-    this.iMClient.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, (conversations) => {
-      for (let conv of conversations) {
-        if (conv.id === id) {
-          console.log(conv.id, conv.name, conv.unreadMessagesCount);
-          conv.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-            let rawList = [];
-            messages.forEach((message: TextMessage) => {
-              let fm = new firebasemessage();
-              fm.key = message.id;
-              fm.name = message.from;
-              fm.message = message.text;
-              fm.userId = message.from;
-              fm.time = message.timestamp;
-              rawList.push(fm);
-              return false
-            });
-            this.ngZone.run(() => {
-              callback(rawList);
-            });
-          });
-        }
-      }
-    });
-
-    this.eventEmitter.subscribe((data) => {
-      data.conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-        let rawList = [];
-        messages.forEach((message: TextMessage) => {
+        this.ngZone.run(() => {
           let fm = new firebasemessage();
           fm.key = message.id;
           fm.name = message.from;
-          fm.message = message.text;
           fm.userId = message.from;
           fm.time = message.timestamp;
-          rawList.push(fm);
-          return false
+          switch (message.content._lctype) {
+            case TextMessage.TYPE:
+              fm.type = -1;
+              fm.message = message.text;
+              break;
+            case ImageMessage.TYPE:
+              fm.type = -2;
+              fm.imageURL = message.content._lcfile.url;
+              break;
+            default:
+              console.warn('收到未知类型消息');
+          }
+          this.messageList.push(fm);
+          callback(this.messageList);
         });
-        this.ngZone.run(() => {
-          callback(rawList);
-        });
+        // conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+        //   let rawList = [];
+        //   messages.forEach((message: TextMessage) => {
+        //     let fm = new firebasemessage();
+        //     fm.key = message.id;
+        //     fm.name = message.from;
+        //     fm.message = message.text;
+        //     fm.userId = message.from;
+        //     fm.time = message.timestamp;
+        //     rawList.push(fm);
+        //     return false
+        //   });
+        //   this.ngZone.run(() => {
+        //     callback(rawList);
+        //   });
+        // });
+      }
+    });
+
+    // this.iMClient.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, (conversations) => {
+    //   for (let conv of conversations) {
+    //     if (conv.id === id) {
+    //       console.log(conv.id, conv.name, conv.unreadMessagesCount);
+    //       conv.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+    //         let rawList = [];
+    //         messages.forEach((message: TextMessage) => {
+    //           let fm = new firebasemessage();
+    //           fm.key = message.id;
+    //           fm.name = message.from;
+    //           fm.message = message.text;
+    //           fm.userId = message.from;
+    //           fm.time = message.timestamp;
+    //           rawList.push(fm);
+    //           return false
+    //         });
+    //         this.ngZone.run(() => {
+    //           callback(rawList);
+    //         });
+    //       });
+    //     }
+    //   }
+    // });
+
+    this.eventEmitter.subscribe((data) => {
+      let fm = new firebasemessage();
+      fm.key = data.m.id;
+      fm.userId = data.m.from;
+      fm.time = data.m.timestamp;
+      switch (data.m.type) {
+        case TextMessage.TYPE:
+          fm.type = -1;
+          fm.message = data.m.text;
+          break;
+        case ImageMessage.TYPE:
+          fm.type = -2;
+          fm.imageURL = data.m._lcfile.url;
+          break;
+        default:
+          console.warn('收到未知类型消息');
+      }
+      this.ngZone.run(() => {
+        this.messageList.push(fm);
+        callback(this.messageList);
       });
+      // data.conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
+      //   let rawList = [];
+      //   messages.forEach((message: TextMessage) => {
+      //     let fm = new firebasemessage();
+      //     fm.key = message.id;
+      //     fm.name = message.from;
+      //     fm.message = message.text;
+      //     fm.userId = message.from;
+      //     fm.time = message.timestamp;
+      //     rawList.push(fm);
+      //     return false
+      //   });
+      //   this.ngZone.run(() => {
+      //     callback(rawList);
+      //   });
+      // });
     });
   }
 
@@ -364,7 +422,26 @@ export class LeanCloudWebsocketService extends WebsocketService {
       this.ngZone.run(() => {
         return conversation.send(new TextMessage(message)).then((m) => {
           this.eventEmitter.emit({
-            conversation: conversation
+            m: m
+          });
+        });
+      })
+    });
+  }
+
+  sendimage(id: string, image: File): Promise<any> {
+
+    return this.iMClient.getConversation(id).then((conversation) => {
+      let file = new AV.File(image.name, image);
+      return file.save().then(() => {
+        let message = new ImageMessage(file);
+        message.setText('10/10');
+        message.setAttributes({ location: '旧金山' });
+        this.ngZone.run(() => {
+          return conversation.send(message).then((m) => {
+            this.eventEmitter.emit({
+              m: m
+            });
           });
         });
       })
@@ -466,7 +543,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
       this.ngZone.run(() => {
         return conversation.send(new TextMessage(message)).then((m) => {
           this.eventEmitter.emit({
-            conversation: conversation
+            m: m
           });
         });
       })

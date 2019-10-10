@@ -18,11 +18,17 @@
       <ion-avatar *ngIf="currentUsr == item.userId" slot="end">
         <img [src]="currentUsrphoto">
       </ion-avatar>
-      <div *ngIf="currentUsr != item.userId" style="float: left;max-width: 80%;margin-right: auto">
+      <div *ngIf="currentUsr != item.userId && item.type == -1" style="float: left;max-width: 80%;margin-right: auto">
         <p>{{item.message}}</p>
       </div>
-      <div *ngIf="currentUsr == item.userId" style="float: right;max-width: 80%;margin-left: auto">
+      <div *ngIf="currentUsr == item.userId && item.type == -1" style="float: right;max-width: 80%;margin-left: auto">
         <p>{{item.message}}</p>
+      </div>
+      <div *ngIf="currentUsr != item.userId && item.type == -2" style="float: left;max-width: 80%;margin-right: auto">
+        <img [src]="item.imageURL">
+      </div>
+      <div *ngIf="currentUsr == item.userId && item.type == -2" style="float: right;max-width: 80%;margin-left: auto">
+        <img [src]="item.imageURL">
       </div>
     </ion-item>
   </ion-list>
@@ -37,7 +43,11 @@
   <div>
     <ion-item>
       <ion-textarea autoGrow="true" rows="1" [(ngModel)]="message"></ion-textarea>
+      <ion-button (click)="imagesend()">imagesend</ion-button>
       <ion-button slot="end" (click)="send()">send</ion-button>
+    </ion-item>
+    <ion-item *ngIf="messageType">
+      <ion-input type="file" (change)="filechange($event)"></ion-input>
     </ion-item>
   </div>
 </ion-footer>

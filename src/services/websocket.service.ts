@@ -162,6 +162,10 @@ export class WebsocketService {
     });
   }
 
+  sendimage(id: string, image: File): Promise<any> {
+    return null;
+  }
+
   onMessages(id: string, callback) {
     let currentUsr = firebase.auth().currentUser.uid;
     firebase.database().ref('/messages/' + id + '/messageList').on('value', callback);

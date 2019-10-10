@@ -21,11 +21,13 @@ export class PrivateroomComponent implements OnInit {
   currentUsr: string;
   currentUsrphoto: string;
   friendphoto: string;
+  messageType: boolean;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private websocketService: WebsocketService
   ) {
+    this.messageType = false;
     this.currentUsr = this.websocketService.getcurrentUser().uid;
     this.currentUsrphoto = this.websocketService.getcurrentUser().photoURL;
     this.id = this.activatedRoute.snapshot.params['id'];
@@ -39,7 +41,9 @@ export class PrivateroomComponent implements OnInit {
           name: snap.val().name,
           userId: snap.val().userId,
           message: snap.val().message,
-          time: snap.val().time
+          time: snap.val().time,
+          type: snap.val().type,
+          imageURL: snap.val().imageURL
         });
         return false
       });
@@ -63,5 +67,20 @@ export class PrivateroomComponent implements OnInit {
 
   back() {
     this.router.navigate(['/tabs/tab1/roomlist']);
+  }
+
+  imagesend() {
+    this.messageType = !this.messageType;
+  }
+
+  filechange(event) {
+    event.target.files[0];
+    this.websocketService.sendimage(this.id, event.target.files[0])
+      .then((newMessage) => {
+        this.message = '';
+      })
+    .catch(e => {
+      console.log(e);
+    });
   }
 }
