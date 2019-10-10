@@ -278,9 +278,9 @@ export class LeanCloudWebsocketService extends WebsocketService {
     // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
 
     this.iMClient.getConversation(id).then((conversation) => {
-      conversation.queryMessages({ limit: 100, type: null }).then(messages => {
+      conversation.queryMessages({ limit: 100, type: null }).then((messages: ImageMessage) => {
         let rawList = [];
-        messages.forEach((message: TypedMessage) => {
+        messages.forEach((message: ImageMessage) => {
           let fm = new firebasemessage();
           fm.key = message.id;
           fm.name = message.from;
@@ -308,7 +308,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
       });
     });
 
-    this.iMClient.on(Event.MESSAGE, (message: TextMessage, conversation) => {
+    this.iMClient.on(Event.MESSAGE, (message: ImageMessage, conversation) => {
       console.log('收到新消息：' + message.text);
       if (conversation.id === id) {
         console.log('收到新消息：' + message);
