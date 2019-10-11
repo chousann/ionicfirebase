@@ -22,6 +22,8 @@ export class PrivateroomComponent implements OnInit {
   currentUsrphoto: string;
   friendphoto: string;
   messageType: boolean;
+  localurl: any;
+  imageFile: File;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -60,27 +62,35 @@ export class PrivateroomComponent implements OnInit {
       .then((newMessage) => {
         this.message = '';
       })
-    .catch(e => {
-      console.log(e);
-    });
+      .catch(e => {
+        console.log(e);
+      });
   }
 
   back() {
     this.router.navigate(['/tabs/tab1/roomlist']);
   }
 
-  imagesend() {
+  othermeaage() {
     this.messageType = !this.messageType;
   }
 
   filechange(event) {
-    event.target.files[0];
-    this.websocketService.sendimage(this.id, event.target.files[0])
+    this.imageFile = event.target.files[0];
+    let reader = new FileReader();
+    reader.readAsDataURL(event.target.files[0]);
+    reader.onload = (data) => {
+      this.localurl = data.target.result;
+    }
+  }
+
+  sendimage() {
+    this.websocketService.sendimage(this.id, this.imageFile)
       .then((newMessage) => {
         this.message = '';
       })
-    .catch(e => {
-      console.log(e);
-    });
+      .catch(e => {
+        console.log(e);
+      });
   }
 }

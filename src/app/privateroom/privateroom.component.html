@@ -42,12 +42,22 @@
 <ion-footer>
   <div>
     <ion-item>
+      <ion-button (click)="othermeaage()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
       <ion-textarea autoGrow="true" rows="1" [(ngModel)]="message"></ion-textarea>
-      <ion-button (click)="imagesend()">imagesend</ion-button>
       <ion-button slot="end" (click)="send()">send</ion-button>
     </ion-item>
-    <ion-item *ngIf="messageType">
-      <ion-input type="file" (change)="filechange($event)"></ion-input>
-    </ion-item>
+  </div>
+  <div *ngIf="messageType">
+    <div>
+      <ion-item>
+        <ion-input type="file" (change)="filechange($event)"></ion-input>
+        <ion-button [disabled]="!localurl" slot="end" (click)="sendimage()">sendimage</ion-button>
+      </ion-item>
+    </div>
+    <div *ngIf="localurl">
+      <img [src]="localurl">
+    </div>
   </div>
 </ion-footer>
