@@ -79,8 +79,8 @@ export class PrivateroomComponent implements OnInit {
     this.imageFile = event.target.files[0];
     let reader = new FileReader();
     reader.readAsDataURL(event.target.files[0]);
-    reader.onload = (data) => {
-      this.localurl = data.target.result;
+    reader.onload = () => {
+      this.localurl = reader.result;
     }
   }
 
