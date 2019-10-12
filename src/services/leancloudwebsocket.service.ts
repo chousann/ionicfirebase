@@ -6,6 +6,7 @@ import * as AV from 'leancloud-storage';
 import 'leancloud-storage/live-query';
 import { Realtime, IMClient, TextMessage, Event, TypedMessage } from 'leancloud-realtime';
 import { ImageMessage } from 'leancloud-realtime-plugin-typed-messages';
+import { Subscription } from 'rxjs';
 const leanCloudConfig = {
   appId: "JQaGq03cPclsQLMx4tTGrfAX-MdYXbMMI",
   appKey: "I4P0r5JDqsa1KD0siMAASDjO"
@@ -52,6 +53,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
   eventEmitter: EventEmitter<any> = new EventEmitter<any>();
   call: any;
   messageList: Array<any> = new Array<any>();
+  subscription: Subscription
   constructor(
     private ngZone: NgZone
   ) {
@@ -332,6 +334,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
     //   });
     // });
 
+    this.iMClient.off(Event.MESSAGE);
     this.iMClient.on(Event.MESSAGE, (message: ImageMessage, conversation) => {
       console.log('收到新消息：' + message.text);
       let json = localStorage.getItem(AV.User.current().id + id);
@@ -404,7 +407,10 @@ export class LeanCloudWebsocketService extends WebsocketService {
     //   }
     // });
 
-    this.eventEmitter.subscribe((data) => {
+    if(this.subscription) {
+      this.subscription.unsubscribe();
+    }
+    this.subscription = this.eventEmitter.subscribe((data) => {
       let json = localStorage.getItem(AV.User.current().id + id);
       let jsonObj = JSON.parse(json);
       let fm = new firebasemessage();
@@ -525,7 +531,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
       }
     });
 
-    this.iMClient.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, (conversations) => {
+    this.iMClient.once(Event.UNREAD_MESSAGES_COUNT_UPDATE, (conversations) => {
       for (let conv of conversations) {
         if (conv.id === id) {
           console.log(conv.id, conv.name, conv.unreadMessagesCount);
@@ -549,6 +555,7 @@ export class LeanCloudWebsocketService extends WebsocketService {
       }
     });
 
+    this.eventEmitter.unsubscribe();
     this.eventEmitter.subscribe((data) => {
       data.conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
         let rawList = [];
