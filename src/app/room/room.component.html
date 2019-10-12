@@ -18,11 +18,17 @@
       <ion-avatar *ngIf="currentUsr == item.userId" slot="end">
         <img src="https://www.gravatar.com/avatar/2?d=monsterid&f=y">
       </ion-avatar>
-      <div *ngIf="currentUsr != item.userId" style="float: left;max-width: 80%;margin-right: auto">
+      <div *ngIf="currentUsr != item.userId && item.type == -1" style="float: left;max-width: 80%;margin-right: auto">
         <p>{{item.message}}</p>
       </div>
-      <div *ngIf="currentUsr == item.userId" style="float: right;max-width: 80%;margin-left: auto">
+      <div *ngIf="currentUsr == item.userId && item.type == -1" style="float: right;max-width: 80%;margin-left: auto">
         <p>{{item.message}}</p>
+      </div>
+      <div *ngIf="currentUsr != item.userId && item.type == -2" style="float: left;max-width: 80%;margin-right: auto">
+        <img [src]="item.imageURL">
+      </div>
+      <div *ngIf="currentUsr == item.userId && item.type == -2" style="float: right;max-width: 80%;margin-left: auto">
+        <img [src]="item.imageURL">
       </div>
     </ion-item>
   </ion-list>
@@ -36,8 +42,22 @@
 <ion-footer>
   <div>
     <ion-item>
+      <ion-button (click)="othermeaage()">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
       <ion-textarea autoGrow="true" rows="1" [(ngModel)]="message"></ion-textarea>
       <ion-button slot="end" (click)="send()">send</ion-button>
     </ion-item>
+  </div>
+  <div *ngIf="messageType">
+    <div>
+      <ion-item>
+        <ion-input type="file" (change)="filechange($event)"></ion-input>
+        <ion-button [disabled]="!localurl" slot="end" (click)="sendimage()">sendimage</ion-button>
+      </ion-item>
+    </div>
+    <div *ngIf="localurl">
+      <img [src]="localurl">
+    </div>
   </div>
 </ion-footer>

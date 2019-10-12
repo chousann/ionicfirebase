@@ -303,154 +303,16 @@ export class LeanCloudWebsocketService extends WebsocketService {
     }
     let jsonObj = JSON.parse(json);
     callback(this.json_array(jsonObj));
-    // this.iMClient.getConversation(id).then((conversation) => {
-    //   conversation.queryMessages({ limit: 100, type: null }).then((messages: ImageMessage) => {
-    //     let rawList = [];
-    //     messages.forEach((message: ImageMessage) => {
-    //       let fm = new firebasemessage();
-    //       fm.key = message.id;
-    //       fm.name = message.from;
-    //       fm.userId = message.from;
-    //       fm.time = message.timestamp;
-    //       switch (message.content._lctype) {
-    //         case TextMessage.TYPE:
-    //           fm.type = -1;
-    //           fm.message = message.text;
-    //           break;
-    //         case ImageMessage.TYPE:
-    //           fm.type = -2;
-    //           fm.imageURL = message.content._lcfile.url;
-    //           break;
-    //         default:
-    //           console.warn('收到未知类型消息');
-    //       }
-    //       rawList.push(fm);
-    //       return false;
-    //     });
-    //     this.ngZone.run(() => {
-    //       this.messageList = rawList;
-    //       callback(rawList);
-    //     });
-    //   });
-    // });
 
-    this.iMClient.off(Event.MESSAGE);
-    this.iMClient.on(Event.MESSAGE, (message: ImageMessage, conversation) => {
-      console.log('收到新消息：' + message.text);
-      let json = localStorage.getItem(AV.User.current().id + id);
-      let jsonObj = JSON.parse(json);
-      if (conversation.id === id) {
-        console.log('收到新消息：' + message);
-        this.ngZone.run(() => {
-          let fm = new firebasemessage();
-          fm.key = message.id;
-          fm.name = message.from;
-          fm.userId = message.from;
-          fm.time = message.timestamp;
-          switch (message.content._lctype) {
-            case TextMessage.TYPE:
-              fm.type = -1;
-              fm.message = message.text;
-              break;
-            case ImageMessage.TYPE:
-              fm.type = -2;
-              fm.imageURL = message.content._lcfile.url;
-              break;
-            default:
-              console.warn('收到未知类型消息');
-          }
-          jsonObj.push(fm);
-          localStorage.setItem(AV.User.current().id + id, JSON.stringify(jsonObj));
-          this.messageList.push(fm);
-          callback(this.json_array(jsonObj));
-        });
-        // conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-        //   let rawList = [];
-        //   messages.forEach((message: TextMessage) => {
-        //     let fm = new firebasemessage();
-        //     fm.key = message.id;
-        //     fm.name = message.from;
-        //     fm.message = message.text;
-        //     fm.userId = message.from;
-        //     fm.time = message.timestamp;
-        //     rawList.push(fm);
-        //     return false
-        //   });
-        //   this.ngZone.run(() => {
-        //     callback(rawList);
-        //   });
-        // });
-      }
-    });
-
-    // this.iMClient.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, (conversations) => {
-    //   for (let conv of conversations) {
-    //     if (conv.id === id) {
-    //       console.log(conv.id, conv.name, conv.unreadMessagesCount);
-    //       conv.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-    //         let rawList = [];
-    //         messages.forEach((message: TextMessage) => {
-    //           let fm = new firebasemessage();
-    //           fm.key = message.id;
-    //           fm.name = message.from;
-    //           fm.message = message.text;
-    //           fm.userId = message.from;
-    //           fm.time = message.timestamp;
-    //           rawList.push(fm);
-    //           return false
-    //         });
-    //         this.ngZone.run(() => {
-    //           callback(rawList);
-    //         });
-    //       });
-    //     }
-    //   }
-    // });
-
-    if(this.subscription) {
+    if (this.subscription) {
       this.subscription.unsubscribe();
     }
     this.subscription = this.eventEmitter.subscribe((data) => {
       let json = localStorage.getItem(AV.User.current().id + id);
       let jsonObj = JSON.parse(json);
-      let fm = new firebasemessage();
-      fm.key = data.m.id;
-      fm.userId = data.m.from;
-      fm.time = data.m.timestamp;
-      switch (data.m.type) {
-        case TextMessage.TYPE:
-          fm.type = -1;
-          fm.message = data.m.text;
-          break;
-        case ImageMessage.TYPE:
-          fm.type = -2;
-          fm.imageURL = data.m._lcfile.url;
-          break;
-        default:
-          console.warn('收到未知类型消息');
-      }
       this.ngZone.run(() => {
-        jsonObj.push(fm);
-        localStorage.setItem(AV.User.current().id + id, JSON.stringify(jsonObj));
-        this.messageList.push(fm);
         callback(this.json_array(jsonObj));
       });
-      // data.conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-      //   let rawList = [];
-      //   messages.forEach((message: TextMessage) => {
-      //     let fm = new firebasemessage();
-      //     fm.key = message.id;
-      //     fm.name = message.from;
-      //     fm.message = message.text;
-      //     fm.userId = message.from;
-      //     fm.time = message.timestamp;
-      //     rawList.push(fm);
-      //     return false
-      //   });
-      //   this.ngZone.run(() => {
-      //     callback(rawList);
-      //   });
-      // });
     });
   }
 
@@ -459,6 +321,17 @@ export class LeanCloudWebsocketService extends WebsocketService {
     return this.iMClient.getConversation(id).then((conversation) => {
       this.ngZone.run(() => {
         return conversation.send(new TextMessage(message)).then((m) => {
+          let json = localStorage.getItem(AV.User.current().id + conversation.id);
+          let jsonObj = JSON.parse(json);
+          let fm = new firebasemessage();
+          fm.key = m.id;
+          fm.name = m.from;
+          fm.userId = m.from;
+          fm.time = m.timestamp;
+          fm.type = -1;
+          fm.message = m.text;
+          jsonObj.push(fm);
+          localStorage.setItem(AV.User.current().id + conversation.id, JSON.stringify(jsonObj));
           this.eventEmitter.emit({
             m: m
           });
@@ -477,6 +350,17 @@ export class LeanCloudWebsocketService extends WebsocketService {
         message.setAttributes({ location: '旧金山' });
         this.ngZone.run(() => {
           return conversation.send(message).then((m) => {
+            let json = localStorage.getItem(AV.User.current().id + conversation.id);
+            let jsonObj = JSON.parse(json);
+            let fm = new firebasemessage();
+            fm.key = m.id;
+            fm.name = m.from;
+            fm.userId = m.from;
+            fm.time = m.timestamp;
+            fm.type = -2;
+            fm.imageURL = message._file.url();
+            jsonObj.push(fm);
+            localStorage.setItem(AV.User.current().id + conversation.id, JSON.stringify(jsonObj));
             this.eventEmitter.emit({
               m: m
             });
@@ -487,106 +371,11 @@ export class LeanCloudWebsocketService extends WebsocketService {
   }
 
   onMessages(id: string, callback) {
-    // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
-
-    this.iMClient.getConversation(id).then((conversation) => {
-      conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-        let rawList = [];
-        messages.forEach((message: TextMessage) => {
-          let fm = new firebasemessage();
-          fm.key = message.id;
-          fm.name = message.from;
-          fm.message = message.text;
-          fm.userId = message.from;
-          fm.time = message.timestamp;
-          rawList.push(fm);
-          return false
-        });
-        this.ngZone.run(() => {
-          callback(rawList);
-        });
-      });
-    });
-
-    this.iMClient.on(Event.MESSAGE, (message: TextMessage, conversation) => {
-      console.log('收到新消息：' + message.text);
-      if (conversation.id === id) {
-        console.log('收到新消息：' + message);
-        conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-          let rawList = [];
-          messages.forEach((message: TextMessage) => {
-            let fm = new firebasemessage();
-            fm.key = message.id;
-            fm.name = message.from;
-            fm.message = message.text;
-            fm.userId = message.from;
-            fm.time = message.timestamp;
-            rawList.push(fm);
-            return false
-          });
-          this.ngZone.run(() => {
-            callback(rawList);
-          });
-        });
-      }
-    });
-
-    this.iMClient.once(Event.UNREAD_MESSAGES_COUNT_UPDATE, (conversations) => {
-      for (let conv of conversations) {
-        if (conv.id === id) {
-          console.log(conv.id, conv.name, conv.unreadMessagesCount);
-          conv.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-            let rawList = [];
-            messages.forEach((message: TextMessage) => {
-              let fm = new firebasemessage();
-              fm.key = message.id;
-              fm.name = message.from;
-              fm.message = message.text;
-              fm.userId = message.from;
-              fm.time = message.timestamp;
-              rawList.push(fm);
-              return false
-            });
-            this.ngZone.run(() => {
-              callback(rawList);
-            });
-          });
-        }
-      }
-    });
-
-    this.eventEmitter.unsubscribe();
-    this.eventEmitter.subscribe((data) => {
-      data.conversation.queryMessages({ limit: 100, type: TextMessage.TYPE }).then(messages => {
-        let rawList = [];
-        messages.forEach((message: TextMessage) => {
-          let fm = new firebasemessage();
-          fm.key = message.id;
-          fm.name = message.from;
-          fm.message = message.text;
-          fm.userId = message.from;
-          fm.time = message.timestamp;
-          rawList.push(fm);
-          return false
-        });
-        this.ngZone.run(() => {
-          callback(rawList);
-        });
-      });
-    });
+    this.onfriendMessage(id, callback);
   }
 
   roomsend(id: string, message: string): Promise<any> {
-
-    return this.iMClient.getConversation(id).then((conversation) => {
-      this.ngZone.run(() => {
-        return conversation.send(new TextMessage(message)).then((m) => {
-          this.eventEmitter.emit({
-            m: m
-          });
-        });
-      })
-    });
+    return this.send(id, message);
   }
 
   onMyRooms(callback) {
@@ -636,8 +425,38 @@ export class LeanCloudWebsocketService extends WebsocketService {
     });
 
     // 当前用户收到了某一条消息，可以通过响应 Event.MESSAGE 这一事件来处理。
-    this.iMClient.on(Event.MESSAGE, function (message: TextMessage, conversation) {
+    this.iMClient.on(Event.MESSAGE, (message: ImageMessage, conversation) => {
       console.log('收到新消息：' + message.text);
+      let json = localStorage.getItem(AV.User.current().id + conversation.id);
+      if (!json) {
+        let data = [];
+        localStorage.setItem(AV.User.current().id + conversation.id, JSON.stringify(data));
+        json = localStorage.getItem(AV.User.current().id + conversation.id);
+      }
+      let jsonObj = JSON.parse(json);
+      let fm = new firebasemessage();
+      fm.key = message.id;
+      fm.name = message.from;
+      fm.userId = message.from;
+      fm.time = message.timestamp;
+      switch (message.content._lctype) {
+        case TextMessage.TYPE:
+          fm.type = -1;
+          fm.message = message.text;
+          break;
+        case ImageMessage.TYPE:
+          fm.type = -2;
+          fm.imageURL = message.content._lcfile.url;
+          break;
+        default:
+          console.warn('收到未知类型消息');
+      }
+      jsonObj.push(fm);
+      localStorage.setItem(AV.User.current().id + conversation.id, JSON.stringify(jsonObj));
+      this.messageList.push(fm);
+      this.eventEmitter.emit({
+        m: message
+      });
       callback();
     });
   }
